@@ -3,6 +3,6 @@ templates/*
 *~
 .*.swp
 build/*
-
 *autobuild-stamp
+.ycm*
 
