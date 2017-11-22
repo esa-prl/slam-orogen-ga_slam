@@ -2,6 +2,7 @@
 #define _GASLAM_TASK_HPP_
 
 #include "ga_slam/TaskBase.hpp"
+#include "ga_slam/GaSlam.hpp"
 
 namespace ga_slam {
 
