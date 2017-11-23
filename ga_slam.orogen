@@ -1,5 +1,44 @@
-name "ga_slam"
+name 'ga_slam'
 
-task_context "Task" do
+import_types_from 'base'
+
+task_context 'Task' do
+    needs_configuration
+
+    ####### Properties #######
+
+
+    ####### Input Ports #######
+    input_port('pointCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud with timestamp in the sensor frame'
+
+    input_port('pose', '/base/samples/RigidBodyState').
+        doc 'Pose estimation (6D) with covariance and timestamp'
+
+    ####### Transformer #######
+    transformer do
+        transform 'slamCamera', 'body'
+
+        align_port 'pointCloud', 0.5
+        # align_port 'pose', 0.5
+
+        max_latency 1.0
+    end
+
+    ####### Output Ports #######
+    output_port('elevationMap', '/base/samples/frame/Frame').
+        doc 'Robot-centric elevation map (2.5D space representation)'
+
+    output_port('correctedPose', '/base/samples/RigidBodyState').
+        doc 'Corrected pose estimation (6D) with covariance and timestamp'
+
+    ####### Debug Ports #######
+    property('debugEnabled', 'bool', true).
+        doc 'Output debug information'
+
+    output_port('filteredPointCloud', '/base/samples/Pointcloud').
+        doc 'Sparse point cloud with timestamp in the map frame'
+
+    port_driven
 end
 

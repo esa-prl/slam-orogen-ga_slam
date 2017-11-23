@@ -10,18 +10,20 @@ class Task : public TaskBase {
   friend class TaskBase;
 
   public:
-    Task(std::string const& name = "ga_slam::Task",
-        TaskCore::TaskState initial_state = Stopped)
-        : TaskBase(name, initial_state) {}
+    Task(std::string const& name = "ga_slam::Task")
+            : TaskBase(name) {}
 
-    Task(std::string const& name,
-        RTT::ExecutionEngine* engine,
-        TaskCore::TaskState initial_state = Stopped)
-        : TaskBase(name, engine, initial_state) {}
+    Task(std::string const& name, RTT::ExecutionEngine* engine)
+            : TaskBase(name, engine) {}
 
-    virtual ~Task() {}
+  protected:
+    void inputPointCloudTransformerCallback(
+            const base::Time& timestamp,
+            const base::samples::Pointcloud& pointCloud);
 
-    bool configureHook() { return TaskBase::configureHook(); }
+    void inputPoseTransformerCallback(
+            const base::Time& timestamp,
+            const base::samples::RigidBodyState& pose);
 };
 
 }  // namespace ga_slam

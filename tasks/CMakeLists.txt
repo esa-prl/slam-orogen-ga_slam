@@ -1,5 +1,3 @@
-# Generated from orogen/lib/orogen/templates/tasks/CMakeLists.txt
-
 include(ga_slamTaskLib)
 ADD_LIBRARY(${GA_SLAM_TASKLIB_NAME} SHARED
     ${GA_SLAM_TASKLIB_SOURCES})
