@@ -5,4 +5,5 @@ templates/*
 build/*
 *autobuild-stamp
 .ycm*
+scripts/*.txt
 
