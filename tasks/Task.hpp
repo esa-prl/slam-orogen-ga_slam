@@ -17,13 +17,14 @@ class Task : public TaskBase {
             : TaskBase(name, engine) {}
 
   protected:
-    void inputPointCloudTransformerCallback(
+    void pointCloudTransformerCallback(
             const base::Time& timestamp,
             const base::samples::Pointcloud& pointCloud);
 
-    void inputPoseTransformerCallback(
-            const base::Time& timestamp,
-            const base::samples::RigidBodyState& pose);
+    bool readPoseAndTF(const base::Time& timestamp);
+
+    base::samples::RigidBodyState inputPose_;
+    Pose cameraToBodyTF_;
 };
 
 }  // namespace ga_slam

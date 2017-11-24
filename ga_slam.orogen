@@ -7,6 +7,9 @@ task_context 'Task' do
 
     ####### Properties #######
 
+    ####### States #######
+    reports 'INPUTS_NOT_ALIGNED'
+    error_states 'TRANSFORM_NOT_FOUND', 'INPUT_NOT_CONNECTED'
 
     ####### Input Ports #######
     input_port('pointCloud', '/base/samples/Pointcloud').
@@ -14,16 +17,6 @@ task_context 'Task' do
 
     input_port('pose', '/base/samples/RigidBodyState').
         doc 'Pose estimation (6D) with covariance and timestamp'
-
-    ####### Transformer #######
-    transformer do
-        transform 'slamCamera', 'body'
-
-        align_port 'pointCloud', 0.5
-        # align_port 'pose', 0.5
-
-        max_latency 1.0
-    end
 
     ####### Output Ports #######
     output_port('elevationMap', '/base/samples/frame/Frame').
@@ -38,6 +31,16 @@ task_context 'Task' do
 
     output_port('filteredPointCloud', '/base/samples/Pointcloud').
         doc 'Sparse point cloud with timestamp in the map frame'
+
+    ####### Transformer #######
+    transformer do
+        transform 'slamCamera', 'body'
+
+        align_port 'pointCloud', 0.5
+        # align_port 'pose', 0.5
+
+        max_latency 1.0
+    end
 
     port_driven
 end
