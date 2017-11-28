@@ -4,6 +4,8 @@ namespace ga_slam {
 
 Task::Task(std::string const& name)
         : TaskBase(name) {
+    gaSlam_.reset(new GaSlam());
+    inputPCLCloud_.reset(new PointCloud);
 }
 
 void Task::pointCloudTransformerCallback(
@@ -11,6 +13,16 @@ void Task::pointCloudTransformerCallback(
         const base::samples::Pointcloud& inputBaseCloud) {
     if (!readPoseAndTF(timestamp))
         return;
+
+    inputPose_ = inputBasePose_.getTransform();
+    convertBaseToPCL(inputBaseCloud, inputPCLCloud_);
+
+    gaSlam_->registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
+
+    if (_debugEnabled.rvalue()) {
+        convertPCLToBase(filteredBaseCloud_, gaSlam_->getFilteredPointCloud());
+        _filteredPointCloud.write(filteredBaseCloud_);
+    }
 }
 
 bool Task::readPoseAndTF(const base::Time& timestamp) {

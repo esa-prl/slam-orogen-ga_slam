@@ -28,8 +28,13 @@ class Task : public TaskBase {
             const PointCloud::ConstPtr& pclCloud);
 
   protected:
+    std::unique_ptr<GaSlam> gaSlam_;
+
+    PointCloud::Ptr inputPCLCloud_;
+    base::samples::Pointcloud filteredBaseCloud_;
 
     base::samples::RigidBodyState inputBasePose_;
+    Pose inputPose_;
 
     Pose cameraToMapTF_;
 };
