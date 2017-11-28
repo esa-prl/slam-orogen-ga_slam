@@ -36,5 +36,26 @@ bool Task::readPoseAndTF(const base::Time& timestamp) {
     return true;
 }
 
+void Task::convertBaseToPCL(
+        const base::samples::Pointcloud& baseCloud,
+        PointCloud::Ptr& pclCloud) {
+    pclCloud->clear();
+    pclCloud->is_dense = true;
+    pclCloud->header.stamp = baseCloud.time.toMicroseconds();
+
+    for (auto& point : baseCloud.points)
+        pclCloud->push_back(pcl::PointXYZ(point.x(), point.y(), point.z()));
+}
+
+void Task::convertPCLToBase(
+        base::samples::Pointcloud& baseCloud,
+        const PointCloud::ConstPtr& pclCloud) {
+    baseCloud.points.clear();
+    baseCloud.time.fromMicroseconds(pclCloud->header.stamp);
+
+    for (auto& point : pclCloud->points)
+        baseCloud.points.push_back(base::Point(point.x, point.y, point.z));
+}
+
 }  // namespace ga_slam
 

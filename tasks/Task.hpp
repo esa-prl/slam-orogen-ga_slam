@@ -23,6 +23,14 @@ class Task : public TaskBase {
 
     bool readPoseAndTF(const base::Time& timestamp);
 
+    static void convertBaseToPCL(
+            const base::samples::Pointcloud& baseCloud,
+            PointCloud::Ptr& pclCloud);
+
+    static void convertPCLToBase(
+            base::samples::Pointcloud& baseCloud,
+            const PointCloud::ConstPtr& pclCloud);
+
     base::samples::RigidBodyState inputPose_;
     Pose cameraToBodyTF_;
 };
