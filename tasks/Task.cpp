@@ -2,9 +2,13 @@
 
 namespace ga_slam {
 
+Task::Task(std::string const& name)
+        : TaskBase(name) {
+}
+
 void Task::pointCloudTransformerCallback(
         const base::Time& timestamp,
-        const base::samples::Pointcloud& pointCloud) {
+        const base::samples::Pointcloud& inputBaseCloud) {
     if (!readPoseAndTF(timestamp))
         return;
 }
@@ -17,7 +21,7 @@ bool Task::readPoseAndTF(const base::Time& timestamp) {
         return false;
     }
 
-    if (_pose.readNewest(inputPose_) != RTT::NewData) {
+    if (_pose.readNewest(inputBasePose_) != RTT::NewData) {
         RTT::log(RTT::Warning) << "[GA SLAM] Cannot associate the input point"
                 << "cloud to the newest input pose." << std::endl;
         report(INPUTS_NOT_ALIGNED);
@@ -26,7 +30,7 @@ bool Task::readPoseAndTF(const base::Time& timestamp) {
         state(RUNNING);
     }
 
-    if (!_slamCamera2body.get(timestamp, cameraToBodyTF_, false)) {
+    if (!_slamCamera2body.get(timestamp, cameraToMapTF_, false)) {
         RTT::log(RTT::Error) << "[GA SLAM] Camera to body TF not found."
                 << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);

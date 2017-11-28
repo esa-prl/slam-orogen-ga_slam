@@ -10,16 +10,12 @@ class Task : public TaskBase {
   friend class TaskBase;
 
   public:
-    Task(std::string const& name = "ga_slam::Task")
-            : TaskBase(name) {}
-
-    Task(std::string const& name, RTT::ExecutionEngine* engine)
-            : TaskBase(name, engine) {}
+    explicit Task(std::string const& name = "ga_slam::Task");
 
   protected:
     void pointCloudTransformerCallback(
             const base::Time& timestamp,
-            const base::samples::Pointcloud& pointCloud);
+            const base::samples::Pointcloud& inputBaseCloud);
 
     bool readPoseAndTF(const base::Time& timestamp);
 
@@ -31,8 +27,11 @@ class Task : public TaskBase {
             base::samples::Pointcloud& baseCloud,
             const PointCloud::ConstPtr& pclCloud);
 
-    base::samples::RigidBodyState inputPose_;
-    Pose cameraToBodyTF_;
+  protected:
+
+    base::samples::RigidBodyState inputBasePose_;
+
+    Pose cameraToMapTF_;
 };
 
 }  // namespace ga_slam
