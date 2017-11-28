@@ -6,9 +6,6 @@ if (ROCK_USE_CXX11)
     rock_activate_cxx11()
 endif()
 
-find_package(PCL REQUIRED)
-include_directories(${PCL_INCLUDE_DIRS})
-
 SET (CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/.orogen/config")
 INCLUDE(ga_slamBase)
 

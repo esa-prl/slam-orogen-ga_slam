@@ -1,5 +1,8 @@
 name 'ga_slam'
 
+using_library 'ga_slam'
+using_library 'pcl_common-1.7'
+
 import_types_from 'base'
 
 task_context 'Task' do
