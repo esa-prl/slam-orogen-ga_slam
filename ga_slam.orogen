@@ -35,7 +35,9 @@ task_context 'Task' do
 
     ####### States #######
     reports 'INPUTS_NOT_ALIGNED'
-    error_states 'TRANSFORM_NOT_FOUND', 'INPUT_NOT_CONNECTED'
+    error_states 'TRANSFORM_NOT_FOUND',
+        'INPUT_NOT_CONNECTED',
+        'PARAMETERS_NOT_SET'
 
     ####### Input Ports #######
     input_port('pointCloud', '/base/samples/Pointcloud').
