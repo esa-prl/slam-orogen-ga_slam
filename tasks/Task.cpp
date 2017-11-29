@@ -77,7 +77,7 @@ void Task::convertBaseToPCL(
     pclCloud->is_dense = true;
     pclCloud->header.stamp = baseCloud.time.toMicroseconds();
 
-    for (auto& point : baseCloud.points)
+    for (const auto& point : baseCloud.points)
         pclCloud->push_back(pcl::PointXYZ(point.x(), point.y(), point.z()));
 }
 
@@ -87,7 +87,7 @@ void Task::convertPCLToBase(
     baseCloud.points.clear();
     baseCloud.time.fromMicroseconds(pclCloud->header.stamp);
 
-    for (auto& point : pclCloud->points)
+    for (const auto& point : pclCloud->points)
         baseCloud.points.push_back(base::Point(point.x, point.y, point.z));
 }
 
