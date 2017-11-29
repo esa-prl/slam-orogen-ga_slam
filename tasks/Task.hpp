@@ -12,10 +12,12 @@ class Task : public TaskBase {
   public:
     explicit Task(std::string const& name = "ga_slam::Task");
 
+    bool configureHook(void) override;
+
   protected:
     void pointCloudTransformerCallback(
             const base::Time& timestamp,
-            const base::samples::Pointcloud& inputBaseCloud);
+            const base::samples::Pointcloud& inputBaseCloud) override;
 
     bool readPoseAndTF(const base::Time& timestamp);
 

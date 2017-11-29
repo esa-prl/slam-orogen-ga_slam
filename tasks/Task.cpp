@@ -8,6 +8,24 @@ Task::Task(std::string const& name)
     inputPCLCloud_.reset(new PointCloud);
 }
 
+bool Task::configureHook(void) {
+    if (!TaskBase::configureHook())
+        return false;
+
+    if (!gaSlam_->setParameters(
+                _mapSizeX.rvalue(), _mapSizeY.rvalue(),
+                _robotPositionX.rvalue(), _robotPositionY.rvalue(),
+                _mapResolution.rvalue(), _voxelSize.rvalue(),
+                _minElevation.rvalue(), _maxElevation.rvalue())) {
+        RTT::log(RTT::Error) << "[GA SLAM] Encountered error when"
+                << " setting parameters." <<  RTT::endlog();
+        error(PARAMETERS_NOT_SET);
+        return false;
+    }
+
+    return true;
+}
+
 void Task::pointCloudTransformerCallback(
         const base::Time& timestamp,
         const base::samples::Pointcloud& inputBaseCloud) {
@@ -35,7 +53,7 @@ bool Task::readPoseAndTF(const base::Time& timestamp) {
 
     if (_pose.readNewest(inputBasePose_) != RTT::NewData) {
         RTT::log(RTT::Warning) << "[GA SLAM] Cannot associate the input point"
-                << "cloud to the newest input pose." << std::endl;
+                << " cloud to the newest input pose." << std::endl;
         report(INPUTS_NOT_ALIGNED);
         return false;
     } else {

@@ -9,10 +9,35 @@ task_context 'Task' do
     needs_configuration
 
     ####### Properties #######
+    property('mapSizeX', 'double', 10.0).
+        doc 'X dimension of the map'
+
+    property('mapSizeY', 'double', 10.0).
+        doc 'Y dimension of the map'
+
+    property('robotPositionX', 'double', 0.0).
+        doc 'X position of the subject inside the map'
+
+    property('robotPositionY', 'double', 0.0).
+        doc 'Y position of the subject inside the map'
+
+    property('mapResolution', 'double', 0.050).
+        doc 'Resolution of each square cell of the map'
+
+    property('voxelSize', 'double', 0.025).
+        doc 'Dimension of each voxel of the point cloud'
+
+    property('minElevation', 'double', -5.0).
+        doc 'Minimum cutoff height of the voxelized point cloud'
+
+    property('maxElevation', 'double', 5.0).
+        doc 'Maximum cutoff height of the voxelized point cloud'
 
     ####### States #######
     reports 'INPUTS_NOT_ALIGNED'
-    error_states 'TRANSFORM_NOT_FOUND', 'INPUT_NOT_CONNECTED'
+    error_states 'TRANSFORM_NOT_FOUND',
+        'INPUT_NOT_CONNECTED',
+        'PARAMETERS_NOT_SET'
 
     ####### Input Ports #######
     input_port('pointCloud', '/base/samples/Pointcloud').
