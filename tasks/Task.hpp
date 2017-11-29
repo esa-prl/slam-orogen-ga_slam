@@ -30,7 +30,7 @@ class Task : public TaskBase {
             const PointCloud::ConstPtr& pclCloud);
 
   protected:
-    std::unique_ptr<GaSlam> gaSlam_;
+    GaSlam gaSlam_;
 
     PointCloud::Ptr inputPCLCloud_;
     base::samples::Pointcloud filteredBaseCloud_;

@@ -3,8 +3,8 @@
 namespace ga_slam {
 
 Task::Task(std::string const& name)
-        : TaskBase(name) {
-    gaSlam_.reset(new GaSlam());
+        : TaskBase(name),
+          gaSlam_() {
     inputPCLCloud_.reset(new PointCloud);
 }
 
@@ -12,7 +12,7 @@ bool Task::configureHook(void) {
     if (!TaskBase::configureHook())
         return false;
 
-    if (!gaSlam_->setParameters(
+    if (!gaSlam_.setParameters(
                 _mapSizeX.rvalue(), _mapSizeY.rvalue(),
                 _robotPositionX.rvalue(), _robotPositionY.rvalue(),
                 _mapResolution.rvalue(), _voxelSize.rvalue(),
@@ -35,10 +35,10 @@ void Task::pointCloudTransformerCallback(
     inputPose_ = inputBasePose_.getTransform();
     convertBaseToPCL(inputBaseCloud, inputPCLCloud_);
 
-    gaSlam_->registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
+    gaSlam_.registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
 
     if (_debugEnabled.rvalue()) {
-        convertPCLToBase(filteredBaseCloud_, gaSlam_->getFilteredPointCloud());
+        convertPCLToBase(filteredBaseCloud_, gaSlam_.getFilteredPointCloud());
         _filteredPointCloud.write(filteredBaseCloud_);
     }
 }
