@@ -29,11 +29,17 @@ class Task : public TaskBase {
             base::samples::Pointcloud& baseCloud,
             const PointCloud::ConstPtr& pclCloud);
 
+    static void convertGridMapToBase(
+        base::samples::frame::Frame& frame,
+        const grid_map::GridMap& gridMap);
+
   protected:
     GaSlam gaSlam_;
 
     PointCloud::Ptr inputPCLCloud_;
     base::samples::Pointcloud filteredBaseCloud_;
+
+    base::samples::frame::Frame elevationMap_;
 
     base::samples::RigidBodyState inputBasePose_;
     Pose inputPose_;
