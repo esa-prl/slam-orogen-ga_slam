@@ -37,7 +37,8 @@ void Task::pointCloudTransformerCallback(
 
     gaSlam_.registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
 
-    convertGridMapToBase(elevationMap_, gaSlam_.getRawMap());
+    convertGridMapToBase(elevationMap_, gaSlam_.getRawMap(),
+            _minElevation.rvalue(), _maxElevation.rvalue());
     _elevationMap.write(elevationMap_);
 
     if (_debugEnabled.rvalue()) {
@@ -96,22 +97,22 @@ void Task::convertPCLToBase(
 
 void Task::convertGridMapToBase(
         base::samples::frame::Frame& frame,
-        const grid_map::GridMap& gridMap) {
+        const grid_map::GridMap& gridMap,
+        const double& minElevation,
+        const double& maxElevation) {
     frame.init(gridMap.getSize()(0), gridMap.getSize()(1));
     frame.time.fromMicroseconds(gridMap.getTimestamp());
 
     std::vector<uint8_t> image;
-
     const grid_map::Matrix& data = gridMap.get("meanZ");
+
     for (grid_map::GridMapIterator it(gridMap); !it.isPastEnd(); ++it) {
         const grid_map::Index index(*it);
-        float value_cm = 100. * data(index(1), index(0));
-        image.push_back(static_cast<uint8_t>(value_cm));
+        image.push_back(static_cast<uint8_t>(data(index(1), index(0))));
     }
 
-    const auto& minmax = std::minmax_element(image.begin(), image.end());
     for (auto& value : image)
-        value = (value - *minmax.first) / (*minmax.second - *minmax.first);
+        value = 255. * (value - minElevation) / (maxElevation - minElevation);
 
     frame.setImage(image);
 }

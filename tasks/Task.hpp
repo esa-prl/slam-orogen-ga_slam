@@ -31,7 +31,9 @@ class Task : public TaskBase {
 
     static void convertGridMapToBase(
         base::samples::frame::Frame& frame,
-        const grid_map::GridMap& gridMap);
+        const grid_map::GridMap& gridMap,
+        const double& minElevation,
+        const double& maxElevation);
 
   protected:
     GaSlam gaSlam_;
