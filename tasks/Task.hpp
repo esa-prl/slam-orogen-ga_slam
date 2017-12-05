@@ -35,11 +35,16 @@ class Task : public TaskBase {
         const double& minElevation,
         const double& maxElevation);
 
+    void convertMapToBaseCloud(
+        base::samples::Pointcloud& baseCloud,
+        const grid_map::GridMap& gridMap);
+
   protected:
     GaSlam gaSlam_;
 
     PointCloud::Ptr inputPCLCloud_;
     base::samples::Pointcloud filteredBaseCloud_;
+    base::samples::Pointcloud mapBaseCloud_;
 
     base::samples::frame::Frame elevationMap_;
 

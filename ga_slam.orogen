@@ -62,7 +62,10 @@ task_context 'Task' do
         doc 'Path to save serialized elevation map'
 
     output_port('filteredPointCloud', '/base/samples/Pointcloud').
-        doc 'Sparse point cloud with timestamp in the map frame'
+        doc 'Filtered sparse point cloud in the map frame'
+
+    output_port('mapPointCloud', '/base/samples/Pointcloud').
+        doc 'Sparse point cloud in the map frame created from the map'
 
     ####### Transformer #######
     transformer do

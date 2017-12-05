@@ -48,7 +48,10 @@ void Task::pointCloudTransformerCallback(
         saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
 
         convertPCLToBase(filteredBaseCloud_, gaSlam_.getFilteredPointCloud());
+        convertMapToBaseCloud(mapBaseCloud_, gaSlam_.getRawMap());
+
         _filteredPointCloud.write(filteredBaseCloud_);
+        _mapPointCloud.write(mapBaseCloud_);
     }
 }
 
@@ -120,6 +123,24 @@ void Task::convertGridMapToBase(
         value = 255. * (value - minElevation) / (maxElevation - minElevation);
 
     frame.setImage(image);
+}
+
+void Task::convertMapToBaseCloud(
+        base::samples::Pointcloud& baseCloud,
+        const grid_map::GridMap& gridMap) {
+    baseCloud.points.clear();
+    baseCloud.time.fromMicroseconds(gridMap.getTimestamp());
+
+    const grid_map::Matrix& data = gridMap.get("meanZ");
+    grid_map::Position point;
+
+    for (grid_map::GridMapIterator it(gridMap); !it.isPastEnd(); ++it) {
+        const grid_map::Index index(*it);
+
+        gridMap.getPosition(index, point);
+        baseCloud.points.push_back(base::Point(
+                point.x(), point.y(), data(index(0), index(1))));
+    }
 }
 
 }  // namespace ga_slam
