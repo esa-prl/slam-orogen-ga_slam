@@ -1,5 +1,7 @@
 #include "Task.hpp"
 
+#include "grid_map_cereal/GridMapCereal.hpp"
+
 namespace ga_slam {
 
 Task::Task(std::string const& name)
@@ -37,11 +39,14 @@ void Task::pointCloudTransformerCallback(
 
     gaSlam_.registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
 
+
     convertGridMapToBase(elevationMap_, gaSlam_.getRawMap(),
             _minElevation.rvalue(), _maxElevation.rvalue());
     _elevationMap.write(elevationMap_);
 
     if (_debugEnabled.rvalue()) {
+        saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
+
         convertPCLToBase(filteredBaseCloud_, gaSlam_.getFilteredPointCloud());
         _filteredPointCloud.write(filteredBaseCloud_);
     }

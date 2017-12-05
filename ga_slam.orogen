@@ -1,6 +1,7 @@
 name 'ga_slam'
 
 using_library 'ga_slam'
+using_library 'grid_map_cereal'
 using_library 'pcl_common-1.7'
 
 import_types_from 'base'
@@ -56,6 +57,9 @@ task_context 'Task' do
     ####### Debug Ports #######
     property('debugEnabled', 'bool', true).
         doc 'Output debug information'
+
+    property('savePath', '/std/string', '/tmp/ga_slam_map.cereal').
+        doc 'Path to save serialized elevation map'
 
     output_port('filteredPointCloud', '/base/samples/Pointcloud').
         doc 'Sparse point cloud with timestamp in the map frame'

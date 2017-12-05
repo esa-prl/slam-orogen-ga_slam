@@ -11,6 +11,7 @@
   <depend package="base/orogen/types" />
   <depend package="drivers/orogen/aggregator" />
   <depend package="drivers/orogen/transformer" />
+  <depend package="slam/grid_map_cereal" />
   <depend package="slam/ga_slam" />
   <depend package="slam/pcl" />
   <depend package="slam/orogen/pcl" />
