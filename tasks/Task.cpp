@@ -35,21 +35,20 @@ void Task::pointCloudTransformerCallback(
         return;
 
     inputPose_ = inputBasePose_.getTransform();
-    convertBaseToPCL(inputBaseCloud, inputPCLCloud_);
+    convertBaseCloudToPCL(inputBaseCloud, inputPCLCloud_);
 
     gaSlam_.registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
-
-
-    convertGridMapToBase(elevationMap_, gaSlam_.getRawMap(),
-            _minElevation.rvalue(), _maxElevation.rvalue());
-    _elevationMap.write(elevationMap_);
 
     if (_debugEnabled.rvalue()) {
         saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
 
-        convertPCLToBase(filteredBaseCloud_, gaSlam_.getFilteredPointCloud());
+        convertMapToBaseFrame(rawMapBaseFrame_, gaSlam_.getRawMap(),
+                _minElevation.rvalue(), _maxElevation.rvalue());
+        convertPCLToBaseCloud(filteredBaseCloud_,
+                gaSlam_.getFilteredPointCloud());
         convertMapToBaseCloud(mapBaseCloud_, gaSlam_.getRawMap());
 
+        _rawElevationMap.write(rawMapBaseFrame_);
         _filteredPointCloud.write(filteredBaseCloud_);
         _mapPointCloud.write(mapBaseCloud_);
     }
@@ -82,7 +81,7 @@ bool Task::readPoseAndTF(const base::Time& timestamp) {
     return true;
 }
 
-void Task::convertBaseToPCL(
+void Task::convertBaseCloudToPCL(
         const base::samples::Pointcloud& baseCloud,
         PointCloud::Ptr& pclCloud) {
     pclCloud->clear();
@@ -93,7 +92,7 @@ void Task::convertBaseToPCL(
         pclCloud->push_back(pcl::PointXYZ(point.x(), point.y(), point.z()));
 }
 
-void Task::convertPCLToBase(
+void Task::convertPCLToBaseCloud(
         base::samples::Pointcloud& baseCloud,
         const PointCloud::ConstPtr& pclCloud) {
     baseCloud.points.clear();
@@ -103,9 +102,9 @@ void Task::convertPCLToBase(
         baseCloud.points.push_back(base::Point(point.x, point.y, point.z));
 }
 
-void Task::convertGridMapToBase(
+void Task::convertMapToBaseFrame(
         base::samples::frame::Frame& frame,
-        const grid_map::GridMap& gridMap,
+        const Map& gridMap,
         const double& minElevation,
         const double& maxElevation) {
     frame.init(gridMap.getSize()(0), gridMap.getSize()(1));
@@ -127,7 +126,7 @@ void Task::convertGridMapToBase(
 
 void Task::convertMapToBaseCloud(
         base::samples::Pointcloud& baseCloud,
-        const grid_map::GridMap& gridMap) {
+        const Map& gridMap) {
     baseCloud.points.clear();
     baseCloud.time.fromMicroseconds(gridMap.getTimestamp());
 

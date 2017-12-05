@@ -61,11 +61,14 @@ task_context 'Task' do
     property('savePath', '/std/string', '/tmp/ga_slam_map.cereal').
         doc 'Path to save serialized elevation map'
 
+    output_port('rawElevationMap', '/base/samples/frame/Frame').
+        doc 'Elevation map prior to the neighborhood fusion step'
+
     output_port('filteredPointCloud', '/base/samples/Pointcloud').
         doc 'Filtered sparse point cloud in the map frame'
 
     output_port('mapPointCloud', '/base/samples/Pointcloud').
-        doc 'Sparse point cloud in the map frame created from the map'
+        doc 'Sparse point cloud in the map frame created from the raw map'
 
     ####### Transformer #######
     transformer do
