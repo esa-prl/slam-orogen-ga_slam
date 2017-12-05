@@ -104,16 +104,16 @@ void Task::convertPCLToBaseCloud(
 
 void Task::convertMapToBaseFrame(
         base::samples::frame::Frame& frame,
-        const Map& gridMap,
+        const Map& map,
         const double& minElevation,
         const double& maxElevation) {
-    frame.init(gridMap.getSize()(0), gridMap.getSize()(1));
-    frame.time.fromMicroseconds(gridMap.getTimestamp());
+    frame.init(map.getSize()(0), map.getSize()(1));
+    frame.time.fromMicroseconds(map.getTimestamp());
 
     std::vector<uint8_t> image;
-    const grid_map::Matrix& data = gridMap.get("meanZ");
+    const grid_map::Matrix& data = map.get("meanZ");
 
-    for (grid_map::GridMapIterator it(gridMap); !it.isPastEnd(); ++it) {
+    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
         const grid_map::Index index(*it);
         image.push_back(static_cast<uint8_t>(data(index(1), index(0))));
     }
@@ -124,19 +124,44 @@ void Task::convertMapToBaseFrame(
     frame.setImage(image);
 }
 
+void Task::convertBaseFrameToMap(
+        const base::samples::frame::Frame& frame,
+        Map& map,
+        const double& resolution,
+        const double& positionX,
+        const double& positionY,
+        const double& minElevation,
+        const double& maxElevation) {
+    map.add("meanZ");
+    map.setBasicLayers({"meanZ"});
+    map.clearBasic();
+    map.setTimestamp(frame.time.toMicroseconds());
+    map.setGeometry(grid_map::Length(frame.getWidth(), frame.getHeight()),
+            resolution, grid_map::Position(positionX, positionY));
+
+    grid_map::Matrix& data = map.get("meanZ");
+
+    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
+        const int i = it.getLinearIndex();
+
+        data(i) = (frame.image[i] / 255.) * (maxElevation - minElevation) +
+                minElevation;
+    }
+}
+
 void Task::convertMapToBaseCloud(
         base::samples::Pointcloud& baseCloud,
-        const Map& gridMap) {
+        const Map& map) {
     baseCloud.points.clear();
-    baseCloud.time.fromMicroseconds(gridMap.getTimestamp());
+    baseCloud.time.fromMicroseconds(map.getTimestamp());
 
-    const grid_map::Matrix& data = gridMap.get("meanZ");
+    const grid_map::Matrix& data = map.get("meanZ");
     grid_map::Position point;
 
-    for (grid_map::GridMapIterator it(gridMap); !it.isPastEnd(); ++it) {
+    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
         const grid_map::Index index(*it);
 
-        gridMap.getPosition(index, point);
+        map.getPosition(index, point);
         baseCloud.points.push_back(base::Point(
                 point.x(), point.y(), data(index(0), index(1))));
     }

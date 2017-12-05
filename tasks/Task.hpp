@@ -29,15 +29,24 @@ class Task : public TaskBase {
             base::samples::Pointcloud& baseCloud,
             const PointCloud::ConstPtr& pclCloud);
 
-    static void convertMapToBaseFrame(
-        base::samples::frame::Frame& frame,
-        const Map& gridMap,
+    static void convertBaseFrameToMap(
+        const base::samples::frame::Frame& frame,
+        Map& map,
+        const double& resolution,
+        const double& positionX,
+        const double& positionY,
         const double& minElevation,
         const double& maxElevation);
 
-    void convertMapToBaseCloud(
+    static void convertMapToBaseFrame(
+        base::samples::frame::Frame& frame,
+        const Map& map,
+        const double& minElevation,
+        const double& maxElevation);
+
+    static void convertMapToBaseCloud(
         base::samples::Pointcloud& baseCloud,
-        const Map& gridMap);
+        const Map& map);
 
   protected:
     GaSlam gaSlam_;
