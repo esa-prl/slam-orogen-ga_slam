@@ -1,4 +1,5 @@
 #include "Task.hpp"
+#include "GaSlamBaseConverter.hpp"
 
 #include "grid_map_cereal/GridMapCereal.hpp"
 
@@ -29,39 +30,20 @@ bool Task::configureHook(void) {
 }
 
 void Task::pointCloudTransformerCallback(
-        const base::Time& timestamp,
-        const base::samples::Pointcloud& inputBaseCloud) {
+        const BaseTime& timestamp,
+        const BaseCloud& inputBaseCloud) {
     if (!readPoseAndTF(timestamp))
         return;
 
-    inputPose_ = inputBasePose_.getTransform();
-    convertBaseCloudToPCL(inputBaseCloud, inputPCLCloud_);
+    GaSlamBaseConverter::convertBaseCloudToPCL(inputBaseCloud, inputPCLCloud_);
 
     gaSlam_.registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
 
-    if (_debugInfoEnabled.rvalue()) {
-        if (_rawMapDebugEnabled.rvalue()) {
-            convertMapToBaseDistanceImage(rawMapBaseDistanceImage_,
-                    gaSlam_.getRawMap());
-
-            _rawElevationMap.write(rawMapBaseDistanceImage_);
-        }
-
-        if (_serializationDebugEnabled.rvalue())
-            saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
-
-        if (_pointCloudDebugEnabled.rvalue()) {
-            convertPCLToBaseCloud(filteredBaseCloud_,
-                    gaSlam_.getFilteredPointCloud());
-            convertMapToBaseCloud(mapBaseCloud_, gaSlam_.getRawMap());
-
-            _filteredPointCloud.write(filteredBaseCloud_);
-            _mapPointCloud.write(mapBaseCloud_);
-        }
-    }
+    if (_debugInfoEnabled.rvalue())
+        outputDebugInfo();
 }
 
-bool Task::readPoseAndTF(const base::Time& timestamp) {
+bool Task::readPoseAndTF(const BaseTime& timestamp) {
     if (!_pose.connected()) {
         RTT::log(RTT::Error) << "[GA SLAM] Input pose port is not connected."
                 <<  RTT::endlog();
@@ -75,6 +57,8 @@ bool Task::readPoseAndTF(const base::Time& timestamp) {
         report(INPUTS_NOT_ALIGNED);
         return false;
     } else {
+        inputPose_ = inputBasePose_.getTransform();
+
         state(RUNNING);
     }
 
@@ -88,80 +72,25 @@ bool Task::readPoseAndTF(const base::Time& timestamp) {
     return true;
 }
 
-void Task::convertBaseCloudToPCL(
-        const base::samples::Pointcloud& baseCloud,
-        PointCloud::Ptr& pclCloud) {
-    pclCloud->clear();
-    pclCloud->is_dense = true;
-    pclCloud->header.stamp = baseCloud.time.toMicroseconds();
+void Task::outputDebugInfo(void) {
+    if (_rawMapDebugEnabled.rvalue()) {
+        GaSlamBaseConverter::convertMapToBaseImage(rawMapBaseImage_,
+                gaSlam_.getRawMap());
 
-    for (const auto& point : baseCloud.points)
-        pclCloud->push_back(pcl::PointXYZ(point.x(), point.y(), point.z()));
-}
-
-void Task::convertPCLToBaseCloud(
-        base::samples::Pointcloud& baseCloud,
-        const PointCloud::ConstPtr& pclCloud) {
-    baseCloud.points.clear();
-    baseCloud.time.fromMicroseconds(pclCloud->header.stamp);
-
-    for (const auto& point : pclCloud->points)
-        baseCloud.points.push_back(base::Point(point.x, point.y, point.z));
-}
-
-void Task::convertMapToBaseDistanceImage(
-        base::samples::DistanceImage& image,
-        const Map& map) {
-    image.width = map.getSize()(0);
-    image.height = map.getSize()(1);
-    image.data.clear();
-    image.data.reserve(image.width * image.height);
-    image.time.fromMicroseconds(map.getTimestamp());
-
-    const grid_map::Matrix& mapData = map.get("meanZ");
-
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const auto& index = it.getLinearIndex();
-        image.data.push_back(mapData(index));
+        _rawElevationMap.write(rawMapBaseImage_);
     }
-}
 
-void Task::convertBaseDistanceImageToMap(
-        const base::samples::DistanceImage& image,
-        Map& map,
-        const double& resolution,
-        const double& positionX,
-        const double& positionY) {
-    map.add("meanZ");
-    map.setBasicLayers({"meanZ"});
-    map.clearBasic();
-    map.setTimestamp(image.time.toMicroseconds());
-    map.setGeometry(grid_map::Length(image.width, image.height),
-            resolution, grid_map::Position(positionX, positionY));
+    if (_serializationDebugEnabled.rvalue())
+        saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
 
-    grid_map::Matrix& mapData = map.get("meanZ");
+    if (_pointCloudDebugEnabled.rvalue()) {
+        GaSlamBaseConverter::convertPCLToBaseCloud(filteredBaseCloud_,
+                gaSlam_.getFilteredPointCloud());
+        GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud_,
+                gaSlam_.getRawMap());
 
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const auto& index = it.getLinearIndex();
-        mapData(index) = image.data[index];
-    }
-}
-
-void Task::convertMapToBaseCloud(
-        base::samples::Pointcloud& baseCloud,
-        const Map& map) {
-    baseCloud.points.clear();
-    baseCloud.time.fromMicroseconds(map.getTimestamp());
-
-    const grid_map::Matrix& mapData = map.get("meanZ");
-    grid_map::Position point;
-
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const grid_map::Index index(*it);
-
-        map.getPosition(index, point);
-        baseCloud.points.push_back(base::Point(
-                point.x(), point.y(), mapData(index(0), index(1))));
+        _filteredPointCloud.write(filteredBaseCloud_);
+        _mapPointCloud.write(mapBaseCloud_);
     }
 }
 

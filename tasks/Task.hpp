@@ -4,6 +4,11 @@
 #include "ga_slam/TaskBase.hpp"
 #include "ga_slam/GaSlam.hpp"
 
+using BaseTime = base::Time;
+using BaseCloud = base::samples::Pointcloud;
+using BaseImage = base::samples::DistanceImage;
+using BasePose = base::samples::RigidBodyState;
+
 namespace ga_slam {
 
 class Task : public TaskBase {
@@ -16,45 +21,24 @@ class Task : public TaskBase {
 
   protected:
     void pointCloudTransformerCallback(
-            const base::Time& timestamp,
-            const base::samples::Pointcloud& inputBaseCloud) override;
+            const BaseTime& timestamp,
+            const BaseCloud& inputBaseCloud) override;
 
-    bool readPoseAndTF(const base::Time& timestamp);
+    bool readPoseAndTF(const BaseTime& timestamp);
 
-    static void convertBaseCloudToPCL(
-            const base::samples::Pointcloud& baseCloud,
-            PointCloud::Ptr& pclCloud);
-
-    static void convertPCLToBaseCloud(
-            base::samples::Pointcloud& baseCloud,
-            const PointCloud::ConstPtr& pclCloud);
-
-    static void convertBaseDistanceImageToMap(
-            const base::samples::DistanceImage& image,
-            Map& map,
-            const double& resolution,
-            const double& positionX,
-            const double& positionY);
-
-    static void convertMapToBaseDistanceImage(
-            base::samples::DistanceImage& image,
-            const Map& map);
-
-    static void convertMapToBaseCloud(
-            base::samples::Pointcloud& baseCloud,
-            const Map& map);
+    void outputDebugInfo(void);
 
   protected:
     GaSlam gaSlam_;
 
     PointCloud::Ptr inputPCLCloud_;
-    base::samples::Pointcloud filteredBaseCloud_;
-    base::samples::Pointcloud mapBaseCloud_;
+    BaseCloud filteredBaseCloud_;
+    BaseCloud mapBaseCloud_;
 
-    base::samples::DistanceImage rawMapBaseDistanceImage_;
+    BaseImage rawMapBaseImage_;
 
     Pose inputPose_;
-    base::samples::RigidBodyState inputBasePose_;
+    BasePose inputBasePose_;
 
     Pose cameraToMapTF_;
 };

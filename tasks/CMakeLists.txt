@@ -1,4 +1,10 @@
 include(ga_slamTaskLib)
+
+set(GA_SLAM_TASKLIB_SOURCES
+    ${GA_SLAM_TASKLIB_SOURCES}
+    GaSlamBaseConverter.cpp
+)
+
 ADD_LIBRARY(${GA_SLAM_TASKLIB_NAME} SHARED
     ${GA_SLAM_TASKLIB_SOURCES})
 add_dependencies(${GA_SLAM_TASKLIB_NAME}
