@@ -39,18 +39,25 @@ void Task::pointCloudTransformerCallback(
 
     gaSlam_.registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
 
-    if (_debugEnabled.rvalue()) {
-        saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
+    if (_debugInfoEnabled.rvalue()) {
+        if (_rawMapDebugEnabled.rvalue()) {
+            convertMapToBaseFrame(rawMapBaseFrame_, gaSlam_.getRawMap(),
+                    _minElevation.rvalue(), _maxElevation.rvalue());
 
-        convertMapToBaseFrame(rawMapBaseFrame_, gaSlam_.getRawMap(),
-                _minElevation.rvalue(), _maxElevation.rvalue());
-        convertPCLToBaseCloud(filteredBaseCloud_,
-                gaSlam_.getFilteredPointCloud());
-        convertMapToBaseCloud(mapBaseCloud_, gaSlam_.getRawMap());
+            _rawElevationMap.write(rawMapBaseFrame_);
+        }
 
-        _rawElevationMap.write(rawMapBaseFrame_);
-        _filteredPointCloud.write(filteredBaseCloud_);
-        _mapPointCloud.write(mapBaseCloud_);
+        if (_serializationDebugEnabled.rvalue())
+            saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
+
+        if (_pointCloudDebugEnabled.rvalue()) {
+            convertPCLToBaseCloud(filteredBaseCloud_,
+                    gaSlam_.getFilteredPointCloud());
+            convertMapToBaseCloud(mapBaseCloud_, gaSlam_.getRawMap());
+
+            _filteredPointCloud.write(filteredBaseCloud_);
+            _mapPointCloud.write(mapBaseCloud_);
+        }
     }
 }
 

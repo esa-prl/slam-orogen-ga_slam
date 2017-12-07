@@ -55,8 +55,18 @@ task_context 'Task' do
         doc 'Corrected pose estimation (6D) with covariance and timestamp'
 
     ####### Debug Ports #######
-    property('debugEnabled', 'bool', true).
-        doc 'Output debug information'
+    property('debugInfoEnabled', 'bool', false).
+        doc 'Output debug information. This must be enabled for the' +
+            'other debug properties to have an effect'
+
+    property('rawMapDebugEnabled', 'bool', false).
+        doc 'Output the raw elevation map'
+
+    property('pointCloudDebugEnabled', 'bool', false).
+        doc 'Output filtered input point cloud and map point cloud'
+
+    property('serializationDebugEnabled', 'bool', false).
+        doc 'Serialize the raw map and save it to disk'
 
     property('savePath', '/std/string', '/tmp/ga_slam_map.cereal').
         doc 'Path to save serialized elevation map'
