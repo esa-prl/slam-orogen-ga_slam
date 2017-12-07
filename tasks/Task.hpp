@@ -29,24 +29,20 @@ class Task : public TaskBase {
             base::samples::Pointcloud& baseCloud,
             const PointCloud::ConstPtr& pclCloud);
 
-    static void convertBaseFrameToMap(
-        const base::samples::frame::Frame& frame,
-        Map& map,
-        const double& resolution,
-        const double& positionX,
-        const double& positionY,
-        const double& minElevation,
-        const double& maxElevation);
+    static void convertBaseDistanceImageToMap(
+            const base::samples::DistanceImage& image,
+            Map& map,
+            const double& resolution,
+            const double& positionX,
+            const double& positionY);
 
-    static void convertMapToBaseFrame(
-        base::samples::frame::Frame& frame,
-        const Map& map,
-        const double& minElevation,
-        const double& maxElevation);
+    static void convertMapToBaseDistanceImage(
+            base::samples::DistanceImage& image,
+            const Map& map);
 
     static void convertMapToBaseCloud(
-        base::samples::Pointcloud& baseCloud,
-        const Map& map);
+            base::samples::Pointcloud& baseCloud,
+            const Map& map);
 
   protected:
     GaSlam gaSlam_;
@@ -55,7 +51,7 @@ class Task : public TaskBase {
     base::samples::Pointcloud filteredBaseCloud_;
     base::samples::Pointcloud mapBaseCloud_;
 
-    base::samples::frame::Frame rawMapBaseFrame_;
+    base::samples::DistanceImage rawMapBaseDistanceImage_;
 
     Pose inputPose_;
     base::samples::RigidBodyState inputBasePose_;

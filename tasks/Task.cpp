@@ -41,10 +41,10 @@ void Task::pointCloudTransformerCallback(
 
     if (_debugInfoEnabled.rvalue()) {
         if (_rawMapDebugEnabled.rvalue()) {
-            convertMapToBaseFrame(rawMapBaseFrame_, gaSlam_.getRawMap(),
-                    _minElevation.rvalue(), _maxElevation.rvalue());
+            convertMapToBaseDistanceImage(rawMapBaseDistanceImage_,
+                    gaSlam_.getRawMap());
 
-            _rawElevationMap.write(rawMapBaseFrame_);
+            _rawElevationMap.write(rawMapBaseDistanceImage_);
         }
 
         if (_serializationDebugEnabled.rvalue())
@@ -109,50 +109,41 @@ void Task::convertPCLToBaseCloud(
         baseCloud.points.push_back(base::Point(point.x, point.y, point.z));
 }
 
-void Task::convertMapToBaseFrame(
-        base::samples::frame::Frame& frame,
-        const Map& map,
-        const double& minElevation,
-        const double& maxElevation) {
-    frame.init(map.getSize()(0), map.getSize()(1));
-    frame.time.fromMicroseconds(map.getTimestamp());
+void Task::convertMapToBaseDistanceImage(
+        base::samples::DistanceImage& image,
+        const Map& map) {
+    image.width = map.getSize()(0);
+    image.height = map.getSize()(1);
+    image.data.clear();
+    image.data.reserve(image.width * image.height);
+    image.time.fromMicroseconds(map.getTimestamp());
 
-    std::vector<uint8_t> image;
-    const grid_map::Matrix& data = map.get("meanZ");
+    const grid_map::Matrix& mapData = map.get("meanZ");
 
     for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const grid_map::Index index(*it);
-        image.push_back(static_cast<uint8_t>(data(index(1), index(0))));
+        const auto& index = it.getLinearIndex();
+        image.data.push_back(mapData(index));
     }
-
-    for (auto& value : image)
-        value = 255. * (value - minElevation) / (maxElevation - minElevation);
-
-    frame.setImage(image);
 }
 
-void Task::convertBaseFrameToMap(
-        const base::samples::frame::Frame& frame,
+void Task::convertBaseDistanceImageToMap(
+        const base::samples::DistanceImage& image,
         Map& map,
         const double& resolution,
         const double& positionX,
-        const double& positionY,
-        const double& minElevation,
-        const double& maxElevation) {
+        const double& positionY) {
     map.add("meanZ");
     map.setBasicLayers({"meanZ"});
     map.clearBasic();
-    map.setTimestamp(frame.time.toMicroseconds());
-    map.setGeometry(grid_map::Length(frame.getWidth(), frame.getHeight()),
+    map.setTimestamp(image.time.toMicroseconds());
+    map.setGeometry(grid_map::Length(image.width, image.height),
             resolution, grid_map::Position(positionX, positionY));
 
-    grid_map::Matrix& data = map.get("meanZ");
+    grid_map::Matrix& mapData = map.get("meanZ");
 
     for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const int i = it.getLinearIndex();
-
-        data(i) = (frame.image[i] / 255.) * (maxElevation - minElevation) +
-                minElevation;
+        const auto& index = it.getLinearIndex();
+        mapData(index) = image.data[index];
     }
 }
 
@@ -162,7 +153,7 @@ void Task::convertMapToBaseCloud(
     baseCloud.points.clear();
     baseCloud.time.fromMicroseconds(map.getTimestamp());
 
-    const grid_map::Matrix& data = map.get("meanZ");
+    const grid_map::Matrix& mapData = map.get("meanZ");
     grid_map::Position point;
 
     for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
@@ -170,7 +161,7 @@ void Task::convertMapToBaseCloud(
 
         map.getPosition(index, point);
         baseCloud.points.push_back(base::Point(
-                point.x(), point.y(), data(index(0), index(1))));
+                point.x(), point.y(), mapData(index(0), index(1))));
     }
 }
 
