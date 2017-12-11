@@ -84,7 +84,7 @@ task_context 'Task' do
     transformer do
         transform 'slamCamera', 'body'
         align_port 'pointCloud'
-        max_latency 1.0
+        max_latency 0
     end
 
     port_driven 'pointCloud'
