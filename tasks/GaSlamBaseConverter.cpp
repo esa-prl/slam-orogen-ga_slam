@@ -6,6 +6,7 @@ void GaSlamBaseConverter::convertBaseCloudToPCL(
         const BaseCloud& baseCloud,
         PointCloud::Ptr& pclCloud) {
     pclCloud->clear();
+    pclCloud->reserve(baseCloud.points.size());
     pclCloud->is_dense = true;
     pclCloud->header.stamp = baseCloud.time.toMicroseconds();
 
@@ -17,6 +18,7 @@ void GaSlamBaseConverter::convertPCLToBaseCloud(
         BaseCloud& baseCloud,
         const PointCloud::ConstPtr& pclCloud) {
     baseCloud.points.clear();
+    baseCloud.points.reserve(pclCloud->size());
     baseCloud.time.fromMicroseconds(pclCloud->header.stamp);
 
     for (const auto& point : pclCloud->points)
@@ -65,6 +67,7 @@ void GaSlamBaseConverter::convertMapToBaseCloud(
         BaseCloud& baseCloud,
         const Map& map) {
     baseCloud.points.clear();
+    baseCloud.points.reserve(map.getSize().x() * map.getSize().y());
     baseCloud.time.fromMicroseconds(map.getTimestamp());
 
     const grid_map::Matrix& mapData = map.get("meanZ");
