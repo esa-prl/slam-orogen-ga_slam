@@ -34,7 +34,7 @@ void GaSlamBaseConverter::convertMapToBaseImage(
     image.data.reserve(image.width * image.height);
     image.time.fromMicroseconds(map.getTimestamp());
 
-    const grid_map::Matrix& mapData = map.get("meanZ");
+    const auto& mapData = map.get("meanZ");
 
     for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
         const auto& index = it.getLinearIndex();
@@ -55,7 +55,7 @@ void GaSlamBaseConverter::convertBaseImageToMap(
     map.setGeometry(grid_map::Length(image.width, image.height),
             resolution, grid_map::Position(positionX, positionY));
 
-    grid_map::Matrix& mapData = map.get("meanZ");
+    auto& mapData = map.get("meanZ");
 
     for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
         const auto& index = it.getLinearIndex();
@@ -70,7 +70,7 @@ void GaSlamBaseConverter::convertMapToBaseCloud(
     baseCloud.points.reserve(map.getSize().x() * map.getSize().y());
     baseCloud.time.fromMicroseconds(map.getTimestamp());
 
-    const grid_map::Matrix& mapData = map.get("meanZ");
+    const auto& mapData = map.get("meanZ");
     grid_map::Position point;
 
     for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
