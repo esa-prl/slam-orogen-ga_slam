@@ -8,12 +8,11 @@ namespace ga_slam {
 Task::Task(std::string const& name)
         : TaskBase(name),
           gaSlam_() {
-    inputPCLCloud_.reset(new PointCloud);
+    inputCloud_.reset(new PointCloud);
 }
 
 bool Task::configureHook(void) {
-    if (!TaskBase::configureHook())
-        return false;
+    if (!TaskBase::configureHook()) return false;
 
     if (!gaSlam_.setParameters(
                 _mapSizeX.rvalue(), _mapSizeY.rvalue(),
@@ -32,18 +31,25 @@ bool Task::configureHook(void) {
 void Task::pointCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& inputBaseCloud) {
-    if (!readPoseAndTF(timestamp))
-        return;
+    if (!readPoseAndTF(timestamp)) return;
 
-    GaSlamBaseConverter::convertBaseCloudToPCL(inputBaseCloud, inputPCLCloud_);
+    GaSlamBaseConverter::convertBaseCloudToPCL(inputBaseCloud, inputCloud_);
 
-    gaSlam_.registerData(inputPose_, cameraToMapTF_, inputPCLCloud_);
+    gaSlam_.registerData(inputCloud_, inputPose_,
+            sensorToBodyTF_, bodyToGroundTF_);
 
-    if (_debugInfoEnabled.rvalue())
-        outputDebugInfo();
+    if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
 
 bool Task::readPoseAndTF(const BaseTime& timestamp) {
+    if (!_slamSensor2body.get(timestamp, sensorToBodyTF_, false) ||
+            !_body2ground.get(timestamp, bodyToGroundTF_, false)) {
+        RTT::log(RTT::Error) << "[GA SLAM] Sensor to body and body to map"
+                << " transformations not found." << RTT::endlog();
+        error(TRANSFORM_NOT_FOUND);
+        return false;
+    }
+
     if (!_pose.connected()) {
         RTT::log(RTT::Error) << "[GA SLAM] Input pose port is not connected."
                 <<  RTT::endlog();
@@ -51,22 +57,16 @@ bool Task::readPoseAndTF(const BaseTime& timestamp) {
         return false;
     }
 
-    if (_pose.readNewest(inputBasePose_) != RTT::NewData) {
+    BasePose inputBasePose;
+    if (_pose.readNewest(inputBasePose) != RTT::NewData) {
         RTT::log(RTT::Warning) << "[GA SLAM] Cannot associate the input point"
                 << " cloud to the newest input pose." << std::endl;
         report(INPUTS_NOT_ALIGNED);
         return false;
     } else {
-        inputPose_ = inputBasePose_.getTransform();
+        inputPose_ = inputBasePose.getTransform();
 
         state(RUNNING);
-    }
-
-    if (!_slamCamera2body.get(timestamp, cameraToMapTF_, false)) {
-        RTT::log(RTT::Error) << "[GA SLAM] Camera to body TF not found."
-                << RTT::endlog();
-        error(TRANSFORM_NOT_FOUND);
-        return false;
     }
 
     return true;
@@ -74,10 +74,12 @@ bool Task::readPoseAndTF(const BaseTime& timestamp) {
 
 void Task::outputDebugInfo(void) {
     if (_rawMapDebugEnabled.rvalue()) {
-        GaSlamBaseConverter::convertMapToBaseImage(rawMapBaseImage_,
+        BaseImage rawMapBaseImage;
+
+        GaSlamBaseConverter::convertMapToBaseImage(rawMapBaseImage,
                 gaSlam_.getRawMap());
 
-        _rawElevationMap.write(rawMapBaseImage_);
+        _rawElevationMap.write(rawMapBaseImage);
     }
 
     if (_serializationDebugEnabled.rvalue()) {
@@ -86,13 +88,15 @@ void Task::outputDebugInfo(void) {
     }
 
     if (_pointCloudDebugEnabled.rvalue()) {
-        GaSlamBaseConverter::convertPCLToBaseCloud(filteredBaseCloud_,
+        BaseCloud filteredBaseCloud, mapBaseCloud;
+
+        GaSlamBaseConverter::convertPCLToBaseCloud(filteredBaseCloud,
                 gaSlam_.getFilteredPointCloud());
-        GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud_,
+        GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud,
                 gaSlam_.getRawMap());
 
-        _filteredPointCloud.write(filteredBaseCloud_);
-        _mapPointCloud.write(mapBaseCloud_);
+        _filteredPointCloud.write(filteredBaseCloud);
+        _mapPointCloud.write(mapBaseCloud);
     }
 }
 

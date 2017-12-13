@@ -31,16 +31,12 @@ class Task : public TaskBase {
   protected:
     GaSlam gaSlam_;
 
-    PointCloud::Ptr inputPCLCloud_;
-    BaseCloud filteredBaseCloud_;
-    BaseCloud mapBaseCloud_;
-
-    BaseImage rawMapBaseImage_;
+    PointCloud::Ptr inputCloud_;
 
     Pose inputPose_;
-    BasePose inputBasePose_;
 
-    Pose cameraToMapTF_;
+    Pose sensorToBodyTF_;
+    Pose bodyToGroundTF_;
 };
 
 }  // namespace ga_slam
