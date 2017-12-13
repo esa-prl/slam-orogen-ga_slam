@@ -68,8 +68,11 @@ task_context 'Task' do
     property('serializationDebugEnabled', 'bool', false).
         doc 'Serialize the raw map and save it to disk'
 
-    property('savePath', '/std/string', '/tmp/ga_slam_map.cereal').
-        doc 'Path to save serialized elevation map'
+    property('saveMapPath', '/std/string', '/tmp/ga_slam_map.cereal').
+        doc 'Path to save the serialized elevation map'
+
+    property('savePosePath', '/std/string', '/tmp/ga_slam_pose.cereal').
+        doc 'Path to save the serialized pose'
 
     output_port('rawElevationMap', '/base/samples/DistanceImage').
         doc 'Elevation map prior to the neighborhood fusion step'

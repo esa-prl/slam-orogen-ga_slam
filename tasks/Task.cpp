@@ -80,8 +80,10 @@ void Task::outputDebugInfo(void) {
         _rawElevationMap.write(rawMapBaseImage_);
     }
 
-    if (_serializationDebugEnabled.rvalue())
-        saveGridMap(gaSlam_.getRawMap(), _savePath.rvalue());
+    if (_serializationDebugEnabled.rvalue()) {
+        saveGridMap(gaSlam_.getRawMap(), _saveMapPath.rvalue());
+        savePose(gaSlam_.getCorrectedPose(), _savePosePath.rvalue());
+    }
 
     if (_pointCloudDebugEnabled.rvalue()) {
         GaSlamBaseConverter::convertPCLToBaseCloud(filteredBaseCloud_,
