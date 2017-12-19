@@ -1,26 +1,23 @@
-#ifndef _GASLAM_TASK_HPP_
-#define _GASLAM_TASK_HPP_
+#pragma once
 
 #include "ga_slam/TaskBase.hpp"
 #include "ga_slam/GaSlam.hpp"
+
+namespace ga_slam {
 
 using BaseTime = base::Time;
 using BaseCloud = base::samples::Pointcloud;
 using BaseImage = base::samples::DistanceImage;
 using BasePose = base::samples::RigidBodyState;
 
-namespace ga_slam {
-
 class Task : public TaskBase {
-  friend class TaskBase;
-
   public:
     explicit Task(std::string const& name = "ga_slam::Task");
 
     bool configureHook(void) override;
 
   protected:
-    void pointCloudTransformerCallback(
+    void cloudTransformerCallback(
             const BaseTime& timestamp,
             const BaseCloud& inputBaseCloud) override;
 
@@ -31,7 +28,7 @@ class Task : public TaskBase {
   protected:
     GaSlam gaSlam_;
 
-    PointCloud::Ptr inputCloud_;
+    Cloud::Ptr inputCloud_;
 
     Pose inputPose_;
 
@@ -40,6 +37,4 @@ class Task : public TaskBase {
 };
 
 }  // namespace ga_slam
-
-#endif  // _GASLAM_TASK_HPP_
 

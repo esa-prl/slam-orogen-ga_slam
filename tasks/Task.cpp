@@ -8,7 +8,7 @@ namespace ga_slam {
 Task::Task(std::string const& name)
         : TaskBase(name),
           gaSlam_() {
-    inputCloud_.reset(new PointCloud);
+    inputCloud_.reset(new Cloud);
 }
 
 bool Task::configureHook(void) {
@@ -28,7 +28,7 @@ bool Task::configureHook(void) {
     return true;
 }
 
-void Task::pointCloudTransformerCallback(
+void Task::cloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& inputBaseCloud) {
     if (!readPoseAndTF(timestamp)) return;
@@ -87,16 +87,16 @@ void Task::outputDebugInfo(void) {
         savePose(gaSlam_.getCorrectedPose(), _savePosePath.rvalue());
     }
 
-    if (_pointCloudDebugEnabled.rvalue()) {
+    if (_cloudDebugEnabled.rvalue()) {
         BaseCloud filteredBaseCloud, mapBaseCloud;
 
         GaSlamBaseConverter::convertPCLToBaseCloud(filteredBaseCloud,
-                gaSlam_.getFilteredPointCloud());
+                gaSlam_.getFilteredCloud());
         GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud,
                 gaSlam_.getRawMap());
 
-        _filteredPointCloud.write(filteredBaseCloud);
-        _mapPointCloud.write(mapBaseCloud);
+        _filteredCloud.write(filteredBaseCloud);
+        _mapCloud.write(mapBaseCloud);
     }
 }
 

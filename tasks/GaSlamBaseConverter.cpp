@@ -6,7 +6,7 @@ namespace ga_slam {
 
 void GaSlamBaseConverter::convertBaseCloudToPCL(
         const BaseCloud& baseCloud,
-        PointCloud::Ptr& pclCloud) {
+        Cloud::Ptr& pclCloud) {
     pclCloud->clear();
     pclCloud->reserve(baseCloud.points.size());
     pclCloud->is_dense = true;
@@ -18,7 +18,7 @@ void GaSlamBaseConverter::convertBaseCloudToPCL(
 
 void GaSlamBaseConverter::convertPCLToBaseCloud(
         BaseCloud& baseCloud,
-        const PointCloud::ConstPtr& pclCloud) {
+        const Cloud::ConstPtr& pclCloud) {
     baseCloud.points.clear();
     baseCloud.points.reserve(pclCloud->size());
     baseCloud.time.fromMicroseconds(pclCloud->header.stamp);

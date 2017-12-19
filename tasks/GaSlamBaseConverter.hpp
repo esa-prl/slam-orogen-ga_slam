@@ -1,5 +1,4 @@
-#ifndef _GASLAM_TYPE_CONVERTER_HPP_
-#define _GASLAM_TYPE_CONVERTER_HPP_
+#pragma once
 
 #include "ga_slam/Task.hpp"
 
@@ -7,13 +6,15 @@ namespace ga_slam {
 
 class GaSlamBaseConverter {
   public:
+    GaSlamBaseConverter(void) = delete;
+
     static void convertBaseCloudToPCL(
             const BaseCloud& baseCloud,
-            PointCloud::Ptr& pclCloud);
+            Cloud::Ptr& pclCloud);
 
     static void convertPCLToBaseCloud(
             BaseCloud& baseCloud,
-            const PointCloud::ConstPtr& pclCloud);
+            const Cloud::ConstPtr& pclCloud);
 
     static void convertBaseImageToMap(
             const BaseImage& image,
@@ -32,6 +33,4 @@ class GaSlamBaseConverter {
 };
 
 }  // namespace ga_slam
-
-#endif  // _GASLAM_TYPE_CONVERTER_HPP_
 
