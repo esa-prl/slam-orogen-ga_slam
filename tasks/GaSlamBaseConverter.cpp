@@ -1,5 +1,7 @@
 #include "GaSlamBaseConverter.hpp"
 
+#include "grid_map_core/iterators/GridMapIterator.hpp"
+
 namespace ga_slam {
 
 void GaSlamBaseConverter::convertBaseCloudToPCL(
