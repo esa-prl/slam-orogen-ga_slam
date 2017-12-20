@@ -44,14 +44,14 @@ task_context 'Task' do
     input_port('cloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud with timestamp in the sensor frame'
 
-    input_port('pose', '/base/samples/RigidBodyState').
+    input_port('poseGuess', '/base/samples/RigidBodyState').
         doc 'Pose estimation (6D) with covariance and timestamp'
 
     ####### Output Ports #######
     output_port('elevationMap', '/base/samples/DistanceImage').
         doc 'Robot-centric elevation map (2.5D space representation)'
 
-    output_port('correctedPose', '/base/samples/RigidBodyState').
+    output_port('estimatedPose', '/base/samples/RigidBodyState').
         doc 'Corrected pose estimation (6D) with covariance and timestamp'
 
     ####### Debug Ports #######
@@ -63,7 +63,7 @@ task_context 'Task' do
         doc 'Output the raw elevation map'
 
     property('cloudDebugEnabled', 'bool', false).
-        doc 'Output filtered input point cloud and map point cloud'
+        doc 'Output processed point cloud and map point cloud'
 
     property('serializationDebugEnabled', 'bool', false).
         doc 'Serialize the raw map and save it to disk'
@@ -77,11 +77,11 @@ task_context 'Task' do
     output_port('rawElevationMap', '/base/samples/DistanceImage').
         doc 'Elevation map prior to the neighborhood fusion step'
 
-    output_port('filteredCloud', '/base/samples/Pointcloud').
-        doc 'Filtered sparse point cloud in the map frame'
+    output_port('processedCloud', '/base/samples/Pointcloud').
+        doc 'Processed point cloud in the map frame'
 
     output_port('mapCloud', '/base/samples/Pointcloud').
-        doc 'Sparse point cloud in the map frame created from the raw map'
+        doc 'Point cloud in the map frame created from the raw map'
 
     ####### Transformer #######
     transformer do

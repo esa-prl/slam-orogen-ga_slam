@@ -19,7 +19,7 @@ class Task : public TaskBase {
   protected:
     void cloudTransformerCallback(
             const BaseTime& timestamp,
-            const BaseCloud& inputBaseCloud) override;
+            const BaseCloud& baseCloud) override;
 
     bool readPoseAndTF(const BaseTime& timestamp);
 
@@ -28,9 +28,9 @@ class Task : public TaskBase {
   protected:
     GaSlam gaSlam_;
 
-    Cloud::Ptr inputCloud_;
+    Cloud::Ptr cloud_;
 
-    Pose inputPose_;
+    Pose poseGuess_;
 
     Pose sensorToBodyTF_;
     Pose bodyToGroundTF_;

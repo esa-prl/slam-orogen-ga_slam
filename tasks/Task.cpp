@@ -8,7 +8,7 @@ namespace ga_slam {
 Task::Task(std::string const& name)
         : TaskBase(name),
           gaSlam_() {
-    inputCloud_.reset(new Cloud);
+    cloud_.reset(new Cloud);
 }
 
 bool Task::configureHook(void) {
@@ -22,6 +22,7 @@ bool Task::configureHook(void) {
         RTT::log(RTT::Error) << "[GA SLAM] Encountered error when"
                 << " setting parameters." <<  RTT::endlog();
         error(PARAMETERS_NOT_SET);
+
         return false;
     }
 
@@ -30,13 +31,12 @@ bool Task::configureHook(void) {
 
 void Task::cloudTransformerCallback(
         const BaseTime& timestamp,
-        const BaseCloud& inputBaseCloud) {
+        const BaseCloud& baseCloud) {
     if (!readPoseAndTF(timestamp)) return;
 
-    GaSlamBaseConverter::convertBaseCloudToPCL(inputBaseCloud, inputCloud_);
+    GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud_);
 
-    gaSlam_.registerData(inputCloud_, inputPose_,
-            sensorToBodyTF_, bodyToGroundTF_);
+    gaSlam_.cloudCallback(cloud_, sensorToBodyTF_, bodyToGroundTF_, poseGuess_);
 
     if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
@@ -47,24 +47,27 @@ bool Task::readPoseAndTF(const BaseTime& timestamp) {
         RTT::log(RTT::Error) << "[GA SLAM] Sensor to body and body to map"
                 << " transformations not found." << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
+
         return false;
     }
 
-    if (!_pose.connected()) {
+    if (!_poseGuess.connected()) {
         RTT::log(RTT::Error) << "[GA SLAM] Input pose port is not connected."
                 <<  RTT::endlog();
         error(INPUT_NOT_CONNECTED);
+
         return false;
     }
 
-    BasePose inputBasePose;
-    if (_pose.readNewest(inputBasePose) != RTT::NewData) {
+    BasePose basePoseGuess;
+    if (_poseGuess.readNewest(basePoseGuess) != RTT::NewData) {
         RTT::log(RTT::Warning) << "[GA SLAM] Cannot associate the input point"
-                << " cloud to the newest input pose." << std::endl;
+                << " cloud to the newest input pose guess." << std::endl;
         report(INPUTS_NOT_ALIGNED);
+
         return false;
     } else {
-        inputPose_ = inputBasePose.getTransform();
+        poseGuess_ = basePoseGuess.getTransform();
 
         state(RUNNING);
     }
@@ -84,18 +87,18 @@ void Task::outputDebugInfo(void) {
 
     if (_serializationDebugEnabled.rvalue()) {
         saveGridMap(gaSlam_.getRawMap(), _saveMapPath.rvalue());
-        savePose(gaSlam_.getCorrectedPose(), _savePosePath.rvalue());
+        savePose(gaSlam_.getPose(), _savePosePath.rvalue());
     }
 
     if (_cloudDebugEnabled.rvalue()) {
-        BaseCloud filteredBaseCloud, mapBaseCloud;
+        BaseCloud processedBaseCloud, mapBaseCloud;
 
-        GaSlamBaseConverter::convertPCLToBaseCloud(filteredBaseCloud,
-                gaSlam_.getFilteredCloud());
+        GaSlamBaseConverter::convertPCLToBaseCloud(processedBaseCloud,
+                gaSlam_.getProcessedCloud());
         GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud,
                 gaSlam_.getRawMap());
 
-        _filteredCloud.write(filteredBaseCloud);
+        _processedCloud.write(processedBaseCloud);
         _mapCloud.write(mapBaseCloud);
     }
 }
