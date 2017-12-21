@@ -16,13 +16,6 @@ class GaSlamBaseConverter {
             BaseCloud& baseCloud,
             const Cloud::ConstPtr& pclCloud);
 
-    static void convertBaseImageToMap(
-            const BaseImage& image,
-            Map& map,
-            const double& resolution,
-            const double& positionX,
-            const double& positionY);
-
     static void convertMapToBaseImage(
             BaseImage& image,
             const Map& map);

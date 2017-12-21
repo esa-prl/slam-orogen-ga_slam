@@ -1,7 +1,5 @@
 #include "GaSlamBaseConverter.hpp"
 
-#include "grid_map_core/iterators/GridMapIterator.hpp"
-
 namespace ga_slam {
 
 void GaSlamBaseConverter::convertBaseCloudToPCL(
@@ -30,57 +28,31 @@ void GaSlamBaseConverter::convertPCLToBaseCloud(
 void GaSlamBaseConverter::convertMapToBaseImage(
         BaseImage& image,
         const Map& map) {
-    image.width = map.getSize()(0);
-    image.height = map.getSize()(1);
+    image.width = map.getSizeX();
+    image.height = map.getSizeY();
     image.data.clear();
     image.data.reserve(image.width * image.height);
     image.time.fromMicroseconds(map.getTimestamp());
 
-    const auto& mapData = map.get("meanZ");
+    const auto& meanData = map.getMeanZ();
 
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const auto& index = it.getLinearIndex();
-        image.data.push_back(mapData(index));
-    }
-}
-
-void GaSlamBaseConverter::convertBaseImageToMap(
-        const BaseImage& image,
-        Map& map,
-        const double& resolution,
-        const double& positionX,
-        const double& positionY) {
-    map.add("meanZ");
-    map.setBasicLayers({"meanZ"});
-    map.clearBasic();
-    map.setTimestamp(image.time.toMicroseconds());
-    map.setGeometry(grid_map::Length(image.width, image.height),
-            resolution, grid_map::Position(positionX, positionY));
-
-    auto& mapData = map.get("meanZ");
-
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const auto& index = it.getLinearIndex();
-        mapData(index) = image.data[index];
-    }
+    for (auto&& it = map.begin(); !it.isPastEnd(); ++it)
+        image.data.push_back(meanData(it.getLinearIndex()));
 }
 
 void GaSlamBaseConverter::convertMapToBaseCloud(
         BaseCloud& baseCloud,
         const Map& map) {
     baseCloud.points.clear();
-    baseCloud.points.reserve(map.getSize().x() * map.getSize().y());
+    baseCloud.points.reserve(map.getSizeX() * map.getSizeY());
     baseCloud.time.fromMicroseconds(map.getTimestamp());
 
-    const auto& mapData = map.get("meanZ");
-    grid_map::Position point;
+    const auto& meanData = map.getMeanZ();
+    Eigen::Vector3d point;
 
-    for (grid_map::GridMapIterator it(map); !it.isPastEnd(); ++it) {
-        const grid_map::Index index(*it);
-
-        map.getPosition(index, point);
-        baseCloud.points.push_back(base::Point(
-                point.x(), point.y(), mapData(index(0), index(1))));
+    for (auto&& it = map.begin(); !it.isPastEnd(); ++it) {
+        map.getPointFromArrayIndex(*it, meanData, point);
+        baseCloud.points.push_back(point);
     }
 }
 

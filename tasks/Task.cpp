@@ -14,17 +14,10 @@ Task::Task(std::string const& name)
 bool Task::configureHook(void) {
     if (!TaskBase::configureHook()) return false;
 
-    if (!gaSlam_.setParameters(
-                _mapSizeX.rvalue(), _mapSizeY.rvalue(),
-                _robotPositionX.rvalue(), _robotPositionY.rvalue(),
-                _mapResolution.rvalue(), _voxelSize.rvalue(),
-                _minElevation.rvalue(), _maxElevation.rvalue())) {
-        RTT::log(RTT::Error) << "[GA SLAM] Encountered error when"
-                << " setting parameters." <<  RTT::endlog();
-        error(PARAMETERS_NOT_SET);
-
-        return false;
-    }
+    gaSlam_.setParameters(_mapSizeX.rvalue(), _mapSizeY.rvalue(),
+            _robotPositionX.rvalue(), _robotPositionY.rvalue(),
+            _mapResolution.rvalue(), _voxelSize.rvalue(),
+            _minElevation.rvalue(), _maxElevation.rvalue());
 
     return true;
 }
@@ -86,7 +79,7 @@ void Task::outputDebugInfo(void) {
     }
 
     if (_serializationDebugEnabled.rvalue()) {
-        saveGridMap(gaSlam_.getRawMap(), _saveMapPath.rvalue());
+        saveGridMap(gaSlam_.getRawMap().getGridMap(), _saveMapPath.rvalue());
         savePose(gaSlam_.getPose(), _savePosePath.rvalue());
     }
 
