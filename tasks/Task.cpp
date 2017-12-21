@@ -14,10 +14,9 @@ Task::Task(std::string const& name)
 bool Task::configureHook(void) {
     if (!TaskBase::configureHook()) return false;
 
-    gaSlam_.setParameters(_mapSizeX.rvalue(), _mapSizeY.rvalue(),
-            _robotPositionX.rvalue(), _robotPositionY.rvalue(),
-            _mapResolution.rvalue(), _voxelSize.rvalue(),
-            _minElevation.rvalue(), _maxElevation.rvalue());
+    gaSlam_.setParameters(_mapLengthX.rvalue(), _mapLengthY.rvalue(),
+            _mapResolution.rvalue(), _minElevation.rvalue(),
+            _maxElevation.rvalue(), _voxelSize.rvalue());
 
     return true;
 }
