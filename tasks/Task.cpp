@@ -5,12 +5,6 @@
 
 namespace ga_slam {
 
-Task::Task(std::string const& name)
-        : TaskBase(name),
-          gaSlam_() {
-    cloud_.reset(new Cloud);
-}
-
 bool Task::configureHook(void) {
     if (!TaskBase::configureHook()) return false;
 
@@ -24,18 +18,26 @@ bool Task::configureHook(void) {
 void Task::cloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseCloud) {
-    if (!readPoseAndTF(timestamp)) return;
+    Pose poseGuess, sensorToBodyTF, bodyToGroundTF;
 
-    GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud_);
+    if (!readPortsAndTF(timestamp, poseGuess, sensorToBodyTF, bodyToGroundTF))
+        return;
 
-    gaSlam_.cloudCallback(cloud_, sensorToBodyTF_, bodyToGroundTF_, poseGuess_);
+    Cloud::Ptr cloud(new Cloud);
+    GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud);
+
+    gaSlam_.cloudCallback(cloud, sensorToBodyTF, bodyToGroundTF, poseGuess);
 
     if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
 
-bool Task::readPoseAndTF(const BaseTime& timestamp) {
-    if (!_slamSensor2body.get(timestamp, sensorToBodyTF_, false) ||
-            !_body2ground.get(timestamp, bodyToGroundTF_, false)) {
+bool Task::readPortsAndTF(
+        const BaseTime& timestamp,
+        Pose& poseGuess,
+        Pose& sensorToBodyTF,
+        Pose& bodyToGroundTF) {
+    if (!_slamSensor2body.get(timestamp, sensorToBodyTF, false) ||
+            !_body2ground.get(timestamp, bodyToGroundTF, false)) {
         RTT::log(RTT::Error) << "[GA SLAM] Sensor to body and body to map"
                 << " transformations not found." << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
@@ -59,7 +61,7 @@ bool Task::readPoseAndTF(const BaseTime& timestamp) {
 
         return false;
     } else {
-        poseGuess_ = basePoseGuess.getTransform();
+        poseGuess = basePoseGuess.getTransform();
 
         state(RUNNING);
     }

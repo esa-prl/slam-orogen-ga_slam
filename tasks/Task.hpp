@@ -12,7 +12,9 @@ using BasePose = base::samples::RigidBodyState;
 
 class Task : public TaskBase {
   public:
-    explicit Task(std::string const& name = "ga_slam::Task");
+    explicit Task(std::string const& name = "ga_slam::Task")
+            : TaskBase(name),
+              gaSlam_() {}
 
     bool configureHook(void) override;
 
@@ -21,19 +23,16 @@ class Task : public TaskBase {
             const BaseTime& timestamp,
             const BaseCloud& baseCloud) override;
 
-    bool readPoseAndTF(const BaseTime& timestamp);
+    bool readPortsAndTF(
+            const BaseTime& timestamp,
+            Pose& poseGuess,
+            Pose& sensorToBodyTF,
+            Pose& bodyToGroundTF);
 
     void outputDebugInfo(void);
 
   protected:
     GaSlam gaSlam_;
-
-    Cloud::Ptr cloud_;
-
-    Pose poseGuess_;
-
-    Pose sensorToBodyTF_;
-    Pose bodyToGroundTF_;
 };
 
 }  // namespace ga_slam
