@@ -16,7 +16,7 @@ task_context 'Task' do
     property('mapLengthY', 'double', 10.0).
         doc 'Y dimension of the map'
 
-    property('mapResolution', 'double', 0.050).
+    property('mapResolution', 'double', 0.05).
         doc 'Resolution of each square cell of the map'
 
     property('minElevation', 'double', -5.0).
@@ -27,6 +27,27 @@ task_context 'Task' do
 
     property('voxelSize', 'double', 0.025).
         doc 'Dimension of each voxel of the point cloud'
+
+    property('numParticles', 'int', 100).
+        doc 'Number of particles used in the particle filter'
+
+    property('initialSigmaX', 'double', 0.0).
+        doc 'Sigma of gaussian distribution of x for particle initialization'
+
+    property('initialSigmaY', 'double', 0.0).
+        doc 'Sigma of gaussian distribution of y for particle initialization'
+
+    property('initialSigmaYaw', 'double', 0.0).
+        doc 'Sigma of gaussian distribution of yaw for particle initialization'
+
+    property('predictSigmaX', 'double', 0.2).
+        doc 'Sigma of gaussian distribution of x for particle prediction'
+
+    property('predictSigmaY', 'double', 0.2).
+        doc 'Sigma of gaussian distribution of y for particle prediction'
+
+    property('predictSigmaYaw', 'double', Math::PI/18).
+        doc 'Sigma of gaussian distribution of yaw for particle prediction'
 
     ####### States #######
     reports 'INPUTS_NOT_ALIGNED'
