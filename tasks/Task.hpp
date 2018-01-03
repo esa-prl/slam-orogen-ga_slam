@@ -19,15 +19,17 @@ class Task : public TaskBase {
     bool configureHook(void) override;
 
   protected:
-    void cloudTransformerCallback(
+    void poseGuessTransformerCallback(
             const BaseTime& timestamp,
-            const BaseCloud& baseCloud) override;
+            const BasePose& basePoseGuess) override;
 
-    bool readPortsAndTF(
+    void hazcamCloudTransformerCallback(
             const BaseTime& timestamp,
-            Pose& poseGuess,
-            Pose& sensorToBodyTF,
-            Pose& bodyToGroundTF);
+            const BaseCloud& baseHazcamCloud) override;
+
+    void loccamCloudTransformerCallback(
+            const BaseTime& timestamp,
+            const BaseCloud& baseLoccamCloud) override;
 
     void outputDebugInfo(void);
 

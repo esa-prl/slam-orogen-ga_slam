@@ -18,58 +18,42 @@ bool Task::configureHook(void) {
     return true;
 }
 
-void Task::cloudTransformerCallback(
+void Task::poseGuessTransformerCallback(
         const BaseTime& timestamp,
-        const BaseCloud& baseCloud) {
-    Pose poseGuess, sensorToBodyTF, bodyToGroundTF;
+        const BasePose& basePoseGuess) {
+    Pose poseGuess, bodyToGroundTF;
 
-    if (!readPortsAndTF(timestamp, poseGuess, sensorToBodyTF, bodyToGroundTF))
-        return;
+    if (!_body2ground.get(timestamp, bodyToGroundTF, false)) {
+        RTT::log(RTT::Error) << "Body to ground TF not found" << RTT::endlog();
+        error(TRANSFORM_NOT_FOUND);
+    }
 
-    Cloud::Ptr cloud(new Cloud);
-    GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud);
+    poseGuess = basePoseGuess.getTransform();
 
-    gaSlam_.cloudCallback(cloud, sensorToBodyTF, bodyToGroundTF, poseGuess);
+    gaSlam_.poseCallback(poseGuess, bodyToGroundTF);
 
     if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
 
-bool Task::readPortsAndTF(
+void Task::hazcamCloudTransformerCallback(
         const BaseTime& timestamp,
-        Pose& poseGuess,
-        Pose& sensorToBodyTF,
-        Pose& bodyToGroundTF) {
-    if (!_slamSensor2body.get(timestamp, sensorToBodyTF, false) ||
-            !_body2ground.get(timestamp, bodyToGroundTF, false)) {
-        RTT::log(RTT::Error) << "[GA SLAM] Sensor to body and body to map"
-                << " transformations not found." << RTT::endlog();
+        const BaseCloud& baseHazcamCloud) {
+    Pose sensorToBodyTF;
+
+    if (!_hazcam2body.get(timestamp, sensorToBodyTF, false)) {
+        RTT::log(RTT::Error) << "HazCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
-
-        return false;
     }
 
-    if (!_poseGuess.connected()) {
-        RTT::log(RTT::Error) << "[GA SLAM] Input pose port is not connected."
-                <<  RTT::endlog();
-        error(INPUT_NOT_CONNECTED);
+    Cloud::Ptr cloud(new Cloud);
+    GaSlamBaseConverter::convertBaseCloudToPCL(baseHazcamCloud, cloud);
 
-        return false;
-    }
+    gaSlam_.cloudCallback(cloud, sensorToBodyTF);
+}
 
-    BasePose basePoseGuess;
-    if (_poseGuess.readNewest(basePoseGuess) != RTT::NewData) {
-        RTT::log(RTT::Warning) << "[GA SLAM] Cannot associate the input point"
-                << " cloud to the newest input pose guess." << std::endl;
-        report(INPUTS_NOT_ALIGNED);
-
-        return false;
-    } else {
-        poseGuess = basePoseGuess.getTransform();
-
-        state(RUNNING);
-    }
-
-    return true;
+void Task::loccamCloudTransformerCallback(
+        const BaseTime& timestamp,
+        const BaseCloud& baseLoccamCloud) {
 }
 
 void Task::outputDebugInfo(void) {

@@ -50,12 +50,14 @@ task_context 'Task' do
         doc 'Sigma of gaussian distribution of yaw for particle prediction'
 
     ####### States #######
-    reports 'INPUTS_NOT_ALIGNED'
-    error_states 'TRANSFORM_NOT_FOUND', 'INPUT_NOT_CONNECTED'
+    error_states 'TRANSFORM_NOT_FOUND'
 
     ####### Input Ports #######
-    input_port('cloud', '/base/samples/Pointcloud').
-        doc 'Dense point cloud with timestamp in the sensor frame'
+    input_port('hazcamCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud with timestamp in the sensor (HazCam) frame'
+
+    input_port('loccamCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud with timestamp in the sensor (LocCam) frame'
 
     input_port('poseGuess', '/base/samples/RigidBodyState').
         doc 'Pose estimation (6D) with covariance and timestamp'
@@ -98,12 +100,17 @@ task_context 'Task' do
 
     ####### Transformer #######
     transformer do
-        transform 'slamSensor', 'body'
+        transform 'hazcam', 'body'
+        transform 'loccam', 'body'
         transform 'body', 'ground'
-        align_port 'cloud'
+
+        align_port 'poseGuess'
+        align_port 'hazcamCloud'
+        align_port 'loccamCloud'
+
         max_latency 0
     end
 
-    port_driven 'cloud'
+    port_driven 'poseGuess', 'hazcamCloud', 'loccamCloud'
 end
 
