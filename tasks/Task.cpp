@@ -54,6 +54,17 @@ void Task::hazcamCloudTransformerCallback(
 void Task::loccamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseLoccamCloud) {
+    Pose sensorToBodyTF;
+
+    if (!_loccam2body.get(timestamp, sensorToBodyTF, false)) {
+        RTT::log(RTT::Error) << "LocCam to body TF not found" << RTT::endlog();
+        error(TRANSFORM_NOT_FOUND);
+    }
+
+    Cloud::Ptr cloud(new Cloud);
+    GaSlamBaseConverter::convertBaseCloudToPCL(baseLoccamCloud, cloud);
+
+    gaSlam_.cloudCallback(cloud, sensorToBodyTF);
 }
 
 void Task::outputDebugInfo(void) {
