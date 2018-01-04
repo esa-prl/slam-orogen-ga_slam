@@ -108,7 +108,7 @@ task_context 'Task' do
         align_port 'hazcamCloud'
         align_port 'loccamCloud'
 
-        max_latency 0
+        max_latency 2.0
     end
 
     port_driven 'poseGuess', 'hazcamCloud', 'loccamCloud'
