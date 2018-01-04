@@ -53,14 +53,17 @@ task_context 'Task' do
     error_states 'TRANSFORM_NOT_FOUND'
 
     ####### Input Ports #######
+    input_port('poseGuess', '/base/samples/RigidBodyState').
+        doc 'Pose estimation (6D) with covariance and timestamp'
+
     input_port('hazcamCloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud with timestamp in the sensor (HazCam) frame'
 
     input_port('loccamCloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud with timestamp in the sensor (LocCam) frame'
 
-    input_port('poseGuess', '/base/samples/RigidBodyState').
-        doc 'Pose estimation (6D) with covariance and timestamp'
+    input_port('pancamCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud with timestamp in the sensor (PanCam) frame'
 
     ####### Output Ports #######
     output_port('elevationMap', '/base/samples/DistanceImage').
@@ -102,15 +105,17 @@ task_context 'Task' do
     transformer do
         transform 'hazcam', 'body'
         transform 'loccam', 'body'
+        transform 'pancam', 'body'
         transform 'body', 'ground'
 
         align_port 'poseGuess'
         align_port 'hazcamCloud'
         align_port 'loccamCloud'
+        align_port 'pancamCloud'
 
         max_latency 2.0
     end
 
-    port_driven 'poseGuess', 'hazcamCloud', 'loccamCloud'
+    port_driven 'poseGuess', 'hazcamCloud', 'loccamCloud', 'pancamCloud'
 end
 

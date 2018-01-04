@@ -67,6 +67,22 @@ void Task::loccamCloudTransformerCallback(
     gaSlam_.cloudCallback(cloud, sensorToBodyTF);
 }
 
+void Task::pancamCloudTransformerCallback(
+        const BaseTime& timestamp,
+        const BaseCloud& basePancamCloud) {
+    Pose sensorToBodyTF;
+
+    if (!_pancam2body.get(timestamp, sensorToBodyTF, false)) {
+        RTT::log(RTT::Error) << "PanCam to body TF not found" << RTT::endlog();
+        error(TRANSFORM_NOT_FOUND);
+    }
+
+    Cloud::Ptr cloud(new Cloud);
+    GaSlamBaseConverter::convertBaseCloudToPCL(basePancamCloud, cloud);
+
+    gaSlam_.cloudCallback(cloud, sensorToBodyTF);
+}
+
 void Task::outputDebugInfo(void) {
     if (_rawMapDebugEnabled.rvalue()) {
         BaseImage rawMapBaseImage;

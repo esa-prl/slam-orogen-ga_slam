@@ -31,6 +31,10 @@ class Task : public TaskBase {
             const BaseTime& timestamp,
             const BaseCloud& baseLoccamCloud) override;
 
+    void pancamCloudTransformerCallback(
+            const BaseTime& timestamp,
+            const BaseCloud& basePancamCloud) override;
+
     void outputDebugInfo(void);
 
   protected:
