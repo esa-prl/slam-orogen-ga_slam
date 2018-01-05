@@ -3,6 +3,9 @@
 #include "ga_slam/TaskBase.hpp"
 #include "ga_slam/GaSlam.hpp"
 
+#include <chrono>
+#include <future>
+
 namespace ga_slam {
 
 using BaseTime = base::Time;
@@ -41,8 +44,20 @@ class Task : public TaskBase {
 
     void outputDebugInfo(void);
 
+    template<typename T>
+    bool isFutureReady(const std::future<T>& future) {
+        if (!future.valid()) return true;
+        return (future.wait_for(std::chrono::milliseconds(0)) ==
+                std::future_status::ready);
+    }
+
   protected:
     GaSlam gaSlam_;
+
+    std::future<void> poseGuessFuture_;
+    std::future<void> hazcamCloudFuture_;
+    std::future<void> loccamCloudFuture_;
+    std::future<void> pancamCloudFuture_;
 };
 
 }  // namespace ga_slam

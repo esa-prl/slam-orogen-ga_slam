@@ -21,7 +21,7 @@ bool Task::configureHook(void) {
 void Task::poseGuessTransformerCallback(
         const BaseTime& timestamp,
         const BasePose& basePoseGuess) {
-    std::cout << "[GA SLAM] Received new pose" << std::endl;
+    std::cout << "[GA SLAM] Pose received!" << std::endl;
 
     Pose bodyToGroundTF;
 
@@ -31,17 +31,19 @@ void Task::poseGuessTransformerCallback(
         return;
     }
 
-    Pose poseGuess = basePoseGuess.getTransform();
+    if (!isFutureReady(poseGuessFuture_)) return;
 
-    gaSlam_.poseCallback(poseGuess, bodyToGroundTF);
+    poseGuessFuture_ = std::async(std::launch::async, [&] {
+        gaSlam_.poseCallback(basePoseGuess.getTransform(), bodyToGroundTF);
 
-    if (_debugInfoEnabled.rvalue()) outputDebugInfo();
+        if (_debugInfoEnabled.rvalue()) outputDebugInfo();
+    });
 }
 
 void Task::hazcamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseHazcamCloud) {
-    std::cout << "[GA SLAM] Received new HazCam cloud" << std::endl;
+    std::cout << "[GA SLAM] HazCam Cloud received!" << std::endl;
 
     Pose hazcamToBodyTF;
 
@@ -51,13 +53,17 @@ void Task::hazcamCloudTransformerCallback(
         return;
     }
 
-    cloudCallback(baseHazcamCloud, hazcamToBodyTF);
+    if (!isFutureReady(hazcamCloudFuture_)) return;
+
+    hazcamCloudFuture_ = std::async(std::launch::async, [&] {
+        cloudCallback(baseHazcamCloud, hazcamToBodyTF);
+    });
 }
 
 void Task::loccamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseLoccamCloud) {
-    std::cout << "[GA SLAM] Received new LocCam cloud" << std::endl;
+    std::cout << "[GA SLAM] LocCam Cloud received!" << std::endl;
 
     Pose loccamToBodyTF;
 
@@ -67,13 +73,17 @@ void Task::loccamCloudTransformerCallback(
         return;
     }
 
-    cloudCallback(baseLoccamCloud, loccamToBodyTF);
+    if (!isFutureReady(loccamCloudFuture_)) return;
+
+    loccamCloudFuture_ = std::async(std::launch::async, [&] {
+        cloudCallback(baseLoccamCloud, loccamToBodyTF);
+    });
 }
 
 void Task::pancamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& basePancamCloud) {
-    std::cout << "[GA SLAM] Received new PanCam cloud" << std::endl;
+    std::cout << "[GA SLAM] PanCam Cloud received!" << std::endl;
 
     BasePose basePancamToBodyTF;
 
@@ -83,7 +93,11 @@ void Task::pancamCloudTransformerCallback(
         return;
     }
 
-    cloudCallback(basePancamCloud, basePancamToBodyTF.getTransform());
+    if (!isFutureReady(pancamCloudFuture_)) return;
+
+    pancamCloudFuture_ = std::async(std::launch::async, [&] {
+        cloudCallback(basePancamCloud, basePancamToBodyTF.getTransform());
+    });
 }
 
 void Task::cloudCallback(
