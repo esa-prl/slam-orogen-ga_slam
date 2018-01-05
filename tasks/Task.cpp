@@ -18,58 +18,83 @@ bool Task::configureHook(void) {
     return true;
 }
 
-void Task::cloudTransformerCallback(
+void Task::poseGuessTransformerCallback(
         const BaseTime& timestamp,
-        const BaseCloud& baseCloud) {
-    Pose poseGuess, sensorToBodyTF, bodyToGroundTF;
+        const BasePose& basePoseGuess) {
+    std::cout << "[GA SLAM] Received new pose" << std::endl;
 
-    if (!readPortsAndTF(timestamp, poseGuess, sensorToBodyTF, bodyToGroundTF))
+    Pose bodyToGroundTF;
+
+    if (!_body2ground.get(timestamp, bodyToGroundTF, false)) {
+        RTT::log(RTT::Error) << "Body to ground TF not found" << RTT::endlog();
+        error(TRANSFORM_NOT_FOUND);
         return;
+    }
 
-    Cloud::Ptr cloud(new Cloud);
-    GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud);
+    Pose poseGuess = basePoseGuess.getTransform();
 
-    gaSlam_.cloudCallback(cloud, sensorToBodyTF, bodyToGroundTF, poseGuess);
+    gaSlam_.poseCallback(poseGuess, bodyToGroundTF);
 
     if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
 
-bool Task::readPortsAndTF(
+void Task::hazcamCloudTransformerCallback(
         const BaseTime& timestamp,
-        Pose& poseGuess,
-        Pose& sensorToBodyTF,
-        Pose& bodyToGroundTF) {
-    if (!_slamSensor2body.get(timestamp, sensorToBodyTF, false) ||
-            !_body2ground.get(timestamp, bodyToGroundTF, false)) {
-        RTT::log(RTT::Error) << "[GA SLAM] Sensor to body and body to map"
-                << " transformations not found." << RTT::endlog();
+        const BaseCloud& baseHazcamCloud) {
+    std::cout << "[GA SLAM] Received new HazCam cloud" << std::endl;
+
+    Pose hazcamToBodyTF;
+
+    if (!_hazcam2body.get(timestamp, hazcamToBodyTF, false)) {
+        RTT::log(RTT::Error) << "HazCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
-
-        return false;
+        return;
     }
 
-    if (!_poseGuess.connected()) {
-        RTT::log(RTT::Error) << "[GA SLAM] Input pose port is not connected."
-                <<  RTT::endlog();
-        error(INPUT_NOT_CONNECTED);
+    cloudCallback(baseHazcamCloud, hazcamToBodyTF);
+}
 
-        return false;
+void Task::loccamCloudTransformerCallback(
+        const BaseTime& timestamp,
+        const BaseCloud& baseLoccamCloud) {
+    std::cout << "[GA SLAM] Received new LocCam cloud" << std::endl;
+
+    Pose loccamToBodyTF;
+
+    if (!_loccam2body.get(timestamp, loccamToBodyTF, false)) {
+        RTT::log(RTT::Error) << "LocCam to body TF not found" << RTT::endlog();
+        error(TRANSFORM_NOT_FOUND);
+        return;
     }
 
-    BasePose basePoseGuess;
-    if (_poseGuess.readNewest(basePoseGuess) != RTT::NewData) {
-        RTT::log(RTT::Warning) << "[GA SLAM] Cannot associate the input point"
-                << " cloud to the newest input pose guess." << std::endl;
-        report(INPUTS_NOT_ALIGNED);
+    cloudCallback(baseLoccamCloud, loccamToBodyTF);
+}
 
-        return false;
-    } else {
-        poseGuess = basePoseGuess.getTransform();
+void Task::pancamCloudTransformerCallback(
+        const BaseTime& timestamp,
+        const BaseCloud& basePancamCloud) {
+    std::cout << "[GA SLAM] Received new PanCam cloud" << std::endl;
 
-        state(RUNNING);
+    BasePose basePancamToBodyTF;
+
+    if (_pancamTransformation.read(basePancamToBodyTF) != RTT::NewData) {
+        RTT::log(RTT::Error) << "PanCam to body TF not found" << RTT::endlog();
+        error(TRANSFORM_NOT_FOUND);
+        return;
     }
 
-    return true;
+    cloudCallback(basePancamCloud, basePancamToBodyTF.getTransform());
+}
+
+void Task::cloudCallback(
+        const BaseCloud& baseCloud,
+        const Pose& sensorToBodyTF) {
+    Cloud::Ptr cloud(new Cloud);
+    GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud);
+
+    gaSlam_.cloudCallback(cloud, sensorToBodyTF);
+
+    if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
 
 void Task::outputDebugInfo(void) {

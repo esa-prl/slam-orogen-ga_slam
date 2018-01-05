@@ -50,15 +50,23 @@ task_context 'Task' do
         doc 'Sigma of gaussian distribution of yaw for particle prediction'
 
     ####### States #######
-    reports 'INPUTS_NOT_ALIGNED'
-    error_states 'TRANSFORM_NOT_FOUND', 'INPUT_NOT_CONNECTED'
+    error_states 'TRANSFORM_NOT_FOUND'
 
     ####### Input Ports #######
-    input_port('cloud', '/base/samples/Pointcloud').
-        doc 'Dense point cloud with timestamp in the sensor frame'
-
     input_port('poseGuess', '/base/samples/RigidBodyState').
         doc 'Pose estimation (6D) with covariance and timestamp'
+
+    input_port('hazcamCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud with timestamp in the sensor (HazCam) frame'
+
+    input_port('loccamCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud with timestamp in the sensor (LocCam) frame'
+
+    input_port('pancamCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud with timestamp in the sensor (PanCam) frame'
+
+    input_port('pancamTransformation', '/base/samples/RigidBodyState').
+        doc 'Transformation from pancam sensor frame to robot frame'
 
     ####### Output Ports #######
     output_port('elevationMap', '/base/samples/DistanceImage').
@@ -98,12 +106,20 @@ task_context 'Task' do
 
     ####### Transformer #######
     transformer do
-        transform 'slamSensor', 'body'
+        transform 'hazcam', 'body'
+        transform 'loccam', 'body'
         transform 'body', 'ground'
-        align_port 'cloud'
-        max_latency 0
+
+        # Streams to be aligned with their expected (lookahead) period
+        align_port 'poseGuess', 0.4
+        align_port 'hazcamCloud', 0.6
+        align_port 'loccamCloud', 0.9
+        align_port 'pancamCloud', 2.1
+
+        # Timeout in which collected samples are dropped
+        max_latency 3.0
     end
 
-    port_driven 'cloud'
+    port_driven 'poseGuess', 'hazcamCloud', 'loccamCloud', 'pancamCloud'
 end
 
