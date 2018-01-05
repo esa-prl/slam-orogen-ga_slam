@@ -110,12 +110,14 @@ task_context 'Task' do
         transform 'loccam', 'body'
         transform 'body', 'ground'
 
-        align_port 'poseGuess'
-        align_port 'hazcamCloud'
-        align_port 'loccamCloud'
-        align_port 'pancamCloud'
+        # Streams to be aligned with their expected (lookahead) period
+        align_port 'poseGuess', 0.4
+        align_port 'hazcamCloud', 0.6
+        align_port 'loccamCloud', 0.9
+        align_port 'pancamCloud', 2.1
 
-        max_latency 2.0
+        # Timeout in which collected samples are dropped
+        max_latency 3.0
     end
 
     port_driven 'poseGuess', 'hazcamCloud', 'loccamCloud', 'pancamCloud'
