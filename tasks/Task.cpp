@@ -85,6 +85,8 @@ void Task::cloudCallback(
     GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud);
 
     gaSlam_.cloudCallback(cloud, sensorToBodyTF);
+
+    if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
 
 void Task::outputDebugInfo(void) {
