@@ -39,52 +39,50 @@ void Task::poseGuessTransformerCallback(
 void Task::hazcamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseHazcamCloud) {
-    Pose sensorToBodyTF;
+    Pose hazcamToBodyTF;
 
-    if (!_hazcam2body.get(timestamp, sensorToBodyTF, false)) {
+    if (!_hazcam2body.get(timestamp, hazcamToBodyTF, false)) {
         RTT::log(RTT::Error) << "HazCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
         return;
     }
 
-    Cloud::Ptr cloud(new Cloud);
-    GaSlamBaseConverter::convertBaseCloudToPCL(baseHazcamCloud, cloud);
-
-    gaSlam_.cloudCallback(cloud, sensorToBodyTF);
+    cloudCallback(baseHazcamCloud, hazcamToBodyTF);
 }
 
 void Task::loccamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseLoccamCloud) {
-    Pose sensorToBodyTF;
+    Pose loccamToBodyTF;
 
-    if (!_loccam2body.get(timestamp, sensorToBodyTF, false)) {
+    if (!_loccam2body.get(timestamp, loccamToBodyTF, false)) {
         RTT::log(RTT::Error) << "LocCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
         return;
     }
 
-    Cloud::Ptr cloud(new Cloud);
-    GaSlamBaseConverter::convertBaseCloudToPCL(baseLoccamCloud, cloud);
-
-    gaSlam_.cloudCallback(cloud, sensorToBodyTF);
+    cloudCallback(baseLoccamCloud, loccamToBodyTF);
 }
 
 void Task::pancamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& basePancamCloud) {
-    BasePose baseSensorToBodyTF;
+    BasePose basePancamToBodyTF;
 
-    if (_pancamTransformation.read(baseSensorToBodyTF) != RTT::NewData) {
+    if (_pancamTransformation.read(basePancamToBodyTF) != RTT::NewData) {
         RTT::log(RTT::Error) << "PanCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
         return;
     }
 
-    Pose sensorToBodyTF = baseSensorToBodyTF.getTransform();
+    cloudCallback(basePancamCloud, basePancamToBodyTF.getTransform());
+}
 
+void Task::cloudCallback(
+        const BaseCloud& baseCloud,
+        const Pose& sensorToBodyTF) {
     Cloud::Ptr cloud(new Cloud);
-    GaSlamBaseConverter::convertBaseCloudToPCL(basePancamCloud, cloud);
+    GaSlamBaseConverter::convertBaseCloudToPCL(baseCloud, cloud);
 
     gaSlam_.cloudCallback(cloud, sensorToBodyTF);
 }

@@ -35,6 +35,10 @@ class Task : public TaskBase {
             const BaseTime& timestamp,
             const BaseCloud& basePancamCloud) override;
 
+    void cloudCallback(
+        const BaseCloud& baseCloud,
+        const Pose& sensorToBodyTF);
+
     void outputDebugInfo(void);
 
   protected:
