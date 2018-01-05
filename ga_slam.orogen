@@ -65,6 +65,9 @@ task_context 'Task' do
     input_port('pancamCloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud with timestamp in the sensor (PanCam) frame'
 
+    input_port('pancamTransformation', '/base/samples/RigidBodyState').
+        doc 'Transformation from pancam sensor frame to robot frame'
+
     ####### Output Ports #######
     output_port('elevationMap', '/base/samples/DistanceImage').
         doc 'Robot-centric elevation map (2.5D space representation)'
@@ -105,7 +108,6 @@ task_context 'Task' do
     transformer do
         transform 'hazcam', 'body'
         transform 'loccam', 'body'
-        transform 'pancam', 'body'
         transform 'body', 'ground'
 
         align_port 'poseGuess'

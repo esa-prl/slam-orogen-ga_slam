@@ -26,6 +26,7 @@ void Task::poseGuessTransformerCallback(
     if (!_body2ground.get(timestamp, bodyToGroundTF, false)) {
         RTT::log(RTT::Error) << "Body to ground TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
+        return;
     }
 
     poseGuess = basePoseGuess.getTransform();
@@ -43,6 +44,7 @@ void Task::hazcamCloudTransformerCallback(
     if (!_hazcam2body.get(timestamp, sensorToBodyTF, false)) {
         RTT::log(RTT::Error) << "HazCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
+        return;
     }
 
     Cloud::Ptr cloud(new Cloud);
@@ -59,6 +61,7 @@ void Task::loccamCloudTransformerCallback(
     if (!_loccam2body.get(timestamp, sensorToBodyTF, false)) {
         RTT::log(RTT::Error) << "LocCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
+        return;
     }
 
     Cloud::Ptr cloud(new Cloud);
@@ -70,12 +73,15 @@ void Task::loccamCloudTransformerCallback(
 void Task::pancamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& basePancamCloud) {
-    Pose sensorToBodyTF;
+    BasePose baseSensorToBodyTF;
 
-    if (!_pancam2body.get(timestamp, sensorToBodyTF, false)) {
+    if (_pancamTransformation.read(baseSensorToBodyTF) != RTT::NewData) {
         RTT::log(RTT::Error) << "PanCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
+        return;
     }
+
+    Pose sensorToBodyTF = baseSensorToBodyTF.getTransform();
 
     Cloud::Ptr cloud(new Cloud);
     GaSlamBaseConverter::convertBaseCloudToPCL(basePancamCloud, cloud);
