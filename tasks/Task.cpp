@@ -21,7 +21,9 @@ bool Task::configureHook(void) {
 void Task::poseGuessTransformerCallback(
         const BaseTime& timestamp,
         const BasePose& basePoseGuess) {
-    Pose poseGuess, bodyToGroundTF;
+    std::cout << "[GA SLAM] Received new pose" << std::endl;
+
+    Pose bodyToGroundTF;
 
     if (!_body2ground.get(timestamp, bodyToGroundTF, false)) {
         RTT::log(RTT::Error) << "Body to ground TF not found" << RTT::endlog();
@@ -29,7 +31,7 @@ void Task::poseGuessTransformerCallback(
         return;
     }
 
-    poseGuess = basePoseGuess.getTransform();
+    Pose poseGuess = basePoseGuess.getTransform();
 
     gaSlam_.poseCallback(poseGuess, bodyToGroundTF);
 
@@ -39,6 +41,8 @@ void Task::poseGuessTransformerCallback(
 void Task::hazcamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseHazcamCloud) {
+    std::cout << "[GA SLAM] Received new HazCam cloud" << std::endl;
+
     Pose hazcamToBodyTF;
 
     if (!_hazcam2body.get(timestamp, hazcamToBodyTF, false)) {
@@ -53,6 +57,8 @@ void Task::hazcamCloudTransformerCallback(
 void Task::loccamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseLoccamCloud) {
+    std::cout << "[GA SLAM] Received new LocCam cloud" << std::endl;
+
     Pose loccamToBodyTF;
 
     if (!_loccam2body.get(timestamp, loccamToBodyTF, false)) {
@@ -67,6 +73,8 @@ void Task::loccamCloudTransformerCallback(
 void Task::pancamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& basePancamCloud) {
+    std::cout << "[GA SLAM] Received new PanCam cloud" << std::endl;
+
     BasePose basePancamToBodyTF;
 
     if (_pancamTransformation.read(basePancamToBodyTF) != RTT::NewData) {
