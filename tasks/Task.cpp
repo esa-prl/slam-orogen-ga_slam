@@ -55,9 +55,8 @@ void Task::hazcamCloudTransformerCallback(
 
     if (!isFutureReady(hazcamCloudFuture_)) return;
 
-    hazcamCloudFuture_ = std::async(std::launch::async, [&] {
-        cloudCallback(baseHazcamCloud, hazcamToBodyTF);
-    });
+    hazcamCloudFuture_ = std::async(std::launch::async,
+            &Task::cloudCallback, this, baseHazcamCloud, hazcamToBodyTF);
 }
 
 void Task::loccamCloudTransformerCallback(
@@ -75,9 +74,8 @@ void Task::loccamCloudTransformerCallback(
 
     if (!isFutureReady(loccamCloudFuture_)) return;
 
-    loccamCloudFuture_ = std::async(std::launch::async, [&] {
-        cloudCallback(baseLoccamCloud, loccamToBodyTF);
-    });
+    loccamCloudFuture_ = std::async(std::launch::async,
+            &Task::cloudCallback, this, baseLoccamCloud, loccamToBodyTF);
 }
 
 void Task::pancamCloudTransformerCallback(
@@ -95,9 +93,9 @@ void Task::pancamCloudTransformerCallback(
 
     if (!isFutureReady(pancamCloudFuture_)) return;
 
-    pancamCloudFuture_ = std::async(std::launch::async, [&] {
-        cloudCallback(basePancamCloud, basePancamToBodyTF.getTransform());
-    });
+    pancamCloudFuture_ = std::async(std::launch::async,
+            &Task::cloudCallback, this, basePancamCloud,
+            basePancamToBodyTF.getTransform());
 }
 
 void Task::cloudCallback(
