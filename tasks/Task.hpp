@@ -54,6 +54,11 @@ class Task : public TaskBase {
   protected:
     GaSlam gaSlam_;
 
+    Pose bodyToGroundTF_;
+    Pose hazcamToBodyTF_;
+    Pose loccamToBodyTF_;
+    BasePose basePancamToBodyTF_;
+
     std::future<void> poseGuessFuture_;
     std::future<void> hazcamCloudFuture_;
     std::future<void> loccamCloudFuture_;
