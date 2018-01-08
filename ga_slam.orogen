@@ -31,6 +31,9 @@ task_context 'Task' do
     property('numParticles', 'int', 100).
         doc 'Number of particles used in the particle filter'
 
+    property('resampleFrequency', 'int', 10).
+        doc 'Number of iterations of the particle filter before resampling'
+
     property('initialSigmaX', 'double', 0.0).
         doc 'Sigma of gaussian distribution of x for particle initialization'
 

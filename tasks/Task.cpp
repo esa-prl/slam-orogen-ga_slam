@@ -30,7 +30,8 @@ bool Task::configureHook(void) {
 
     gaSlam_.setParameters(_mapLengthX.rvalue(), _mapLengthY.rvalue(),
             _mapResolution.rvalue(), _minElevation.rvalue(),
-            _maxElevation.rvalue(), _voxelSize.rvalue(), _numParticles.rvalue(),
+            _maxElevation.rvalue(), _voxelSize.rvalue(),
+            _numParticles.rvalue(), _resampleFrequency.rvalue(),
             _initialSigmaX.rvalue(), _initialSigmaY.rvalue(),
             _initialSigmaYaw.rvalue(), _predictSigmaX.rvalue(),
             _predictSigmaY.rvalue(), _predictSigmaYaw.rvalue());
