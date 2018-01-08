@@ -41,11 +41,8 @@ void Task::poseGuessTransformerCallback(
         const BasePose& basePoseGuess) {
     if (!isFutureReady(poseGuessFuture_)) return;
 
-    poseGuessFuture_ = std::async(std::launch::async, [&] {
-        gaSlam_.poseCallback(basePoseGuess.getTransform(), bodyToGroundTF_);
-
-        if (_debugInfoEnabled.rvalue()) outputDebugInfo();
-    });
+    poseGuessFuture_ = std::async(std::launch::async, &GaSlam::poseCallback,
+            &gaSlam_, basePoseGuess.getTransform(), bodyToGroundTF_);
 }
 
 void Task::hazcamCloudTransformerCallback(
@@ -79,8 +76,8 @@ void Task::pancamCloudTransformerCallback(
 
     if (!isFutureReady(pancamCloudFuture_)) return;
 
-    pancamCloudFuture_ = std::async(std::launch::async,
-            &Task::cloudCallback, this, basePancamCloud,
+    pancamCloudFuture_ = std::async(std::launch::async, &Task::cloudCallback,
+            this, basePancamCloud,
             basePancamToBodyTF_.getTransform());
 }
 
