@@ -28,8 +28,10 @@ void GaSlamBaseConverter::convertPCLToBaseCloud(
 void GaSlamBaseConverter::convertMapToBaseImage(
         BaseImage& image,
         const Map& map) {
-    image.width = map.getSizeX();
-    image.height = map.getSizeY();
+    const auto params = map.getParameters();
+
+    image.width = params.sizeX;
+    image.height = params.sizeY;
     image.data.clear();
     image.data.reserve(image.width * image.height);
     image.time.fromMicroseconds(map.getTimestamp());
@@ -43,8 +45,10 @@ void GaSlamBaseConverter::convertMapToBaseImage(
 void GaSlamBaseConverter::convertMapToBaseCloud(
         BaseCloud& baseCloud,
         const Map& map) {
+    const auto params = map.getParameters();
+
     baseCloud.points.clear();
-    baseCloud.points.reserve(map.getSizeX() * map.getSizeY());
+    baseCloud.points.reserve(params.sizeX * params.sizeY);
     baseCloud.time.fromMicroseconds(map.getTimestamp());
 
     const auto& meanData = map.getMeanZ();

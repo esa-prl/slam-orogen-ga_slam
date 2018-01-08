@@ -117,13 +117,10 @@ void Task::outputDebugInfo(void) {
     }
 
     if (_serializationDebugEnabled.rvalue()) {
-        std::unique_lock<std::mutex> poseGuard(gaSlam_.getPoseMutex());
         savePose(gaSlam_.getPose(), _savePosePath.rvalue());
-        poseGuard.unlock();
 
-        std::unique_lock<std::mutex> mapGuard(gaSlam_.getRawMapMutex());
+        std::lock_guard<std::mutex> guard(gaSlam_.getRawMapMutex());
         saveGridMap(gaSlam_.getRawMap().getGridMap(), _saveMapPath.rvalue());
-        mapGuard.unlock();
     }
 }
 
