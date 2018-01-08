@@ -77,8 +77,7 @@ void Task::pancamCloudTransformerCallback(
     if (!isFutureReady(pancamCloudFuture_)) return;
 
     pancamCloudFuture_ = std::async(std::launch::async, &Task::cloudCallback,
-            this, basePancamCloud,
-            basePancamToBodyTF_.getTransform());
+            this, basePancamCloud, basePancamToBodyTF_.getTransform());
 }
 
 void Task::cloudCallback(
@@ -95,28 +94,21 @@ void Task::cloudCallback(
 void Task::outputDebugInfo(void) {
     if (_rawMapDebugEnabled.rvalue()) {
         BaseImage rawMapBaseImage;
-
         GaSlamBaseConverter::convertMapToBaseImage(rawMapBaseImage,
                 gaSlam_.getRawMap());
-
         _rawElevationMap.write(rawMapBaseImage);
+    }
+
+    if (_cloudDebugEnabled.rvalue()) {
+        BaseCloud mapBaseCloud;
+        GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud,
+                gaSlam_.getRawMap());
+        _mapCloud.write(mapBaseCloud);
     }
 
     if (_serializationDebugEnabled.rvalue()) {
         saveGridMap(gaSlam_.getRawMap().getGridMap(), _saveMapPath.rvalue());
         savePose(gaSlam_.getPose(), _savePosePath.rvalue());
-    }
-
-    if (_cloudDebugEnabled.rvalue()) {
-        BaseCloud processedBaseCloud, mapBaseCloud;
-
-        GaSlamBaseConverter::convertPCLToBaseCloud(processedBaseCloud,
-                gaSlam_.getProcessedCloud());
-        GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud,
-                gaSlam_.getRawMap());
-
-        _processedCloud.write(processedBaseCloud);
-        _mapCloud.write(mapBaseCloud);
     }
 }
 
