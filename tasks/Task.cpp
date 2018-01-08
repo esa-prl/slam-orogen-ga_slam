@@ -3,6 +3,8 @@
 
 #include "grid_map_cereal/GridMapCereal.hpp"
 
+#include <mutex>
+
 namespace ga_slam {
 
 bool Task::configureHook(void) {
@@ -94,21 +96,34 @@ void Task::cloudCallback(
 void Task::outputDebugInfo(void) {
     if (_rawMapDebugEnabled.rvalue()) {
         BaseImage rawMapBaseImage;
+
+        std::unique_lock<std::mutex> guard(gaSlam_.getRawMapMutex());
         GaSlamBaseConverter::convertMapToBaseImage(rawMapBaseImage,
                 gaSlam_.getRawMap());
+        guard.unlock();
+
         _rawElevationMap.write(rawMapBaseImage);
     }
 
     if (_cloudDebugEnabled.rvalue()) {
         BaseCloud mapBaseCloud;
+
+        std::unique_lock<std::mutex> guard(gaSlam_.getRawMapMutex());
         GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud,
                 gaSlam_.getRawMap());
+        guard.unlock();
+
         _mapCloud.write(mapBaseCloud);
     }
 
     if (_serializationDebugEnabled.rvalue()) {
-        saveGridMap(gaSlam_.getRawMap().getGridMap(), _saveMapPath.rvalue());
+        std::unique_lock<std::mutex> poseGuard(gaSlam_.getPoseMutex());
         savePose(gaSlam_.getPose(), _savePosePath.rvalue());
+        poseGuard.unlock();
+
+        std::unique_lock<std::mutex> mapGuard(gaSlam_.getRawMapMutex());
+        saveGridMap(gaSlam_.getRawMap().getGridMap(), _saveMapPath.rvalue());
+        mapGuard.unlock();
     }
 }
 
