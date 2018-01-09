@@ -71,6 +71,9 @@ task_context 'Task' do
     input_port('pancamTransformation', '/base/samples/RigidBodyState').
         doc 'Transformation from pancam sensor frame to robot frame'
 
+    input_port('orbiterCloud', '/base/samples/Pointcloud').
+        doc 'Dense point cloud from the orbiter'
+
     ####### Output Ports #######
     output_port('elevationMap', '/base/samples/DistanceImage').
         doc 'Robot-centric elevation map (2.5D space representation)'
@@ -90,12 +93,15 @@ task_context 'Task' do
         doc 'Output processed point cloud and map point cloud'
 
     property('serializationDebugEnabled', 'bool', false).
-        doc 'Serialize the raw map and save it to disk'
+        doc 'Serialize the raw and global maps and save them to disk'
 
-    property('saveMapPath', '/std/string', '/tmp/ga_slam_map.cereal').
-        doc 'Path to save the serialized elevation map'
+    property('localMapPath', '/std/string', '/tmp/ga_slam_local_map.cereal').
+        doc 'Path to save the serialized local elevation map'
 
-    property('savePosePath', '/std/string', '/tmp/ga_slam_pose.cereal').
+    property('globalMapPath', '/std/string', '/tmp/ga_slam_global_map.cereal').
+        doc 'Path to save the serialized global elevation map'
+
+    property('posePath', '/std/string', '/tmp/ga_slam_pose.cereal').
         doc 'Path to save the serialized pose'
 
     output_port('rawElevationMap', '/base/samples/DistanceImage').
@@ -115,11 +121,12 @@ task_context 'Task' do
         align_port 'hazcamCloud', 0.6
         align_port 'loccamCloud', 0.9
         align_port 'pancamCloud', 2.1
+        align_port 'orbiterCloud', 10.0
 
         # Timeout in which collected samples are dropped
-        max_latency 3.0
+        max_latency 30.0
     end
 
-    port_driven 'poseGuess', 'hazcamCloud', 'loccamCloud', 'pancamCloud'
+    port_driven
 end
 

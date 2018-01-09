@@ -38,6 +38,10 @@ class Task : public TaskBase {
             const BaseTime& timestamp,
             const BaseCloud& basePancamCloud) override;
 
+    void orbiterCloudTransformerCallback(
+            const BaseTime& timestamp,
+            const BaseCloud& baseOrbiterCloud) override;
+
     void cloudCallback(
         const BaseCloud& baseCloud,
         const Pose& sensorToBodyTF);
@@ -63,6 +67,7 @@ class Task : public TaskBase {
     std::future<void> hazcamCloudFuture_;
     std::future<void> loccamCloudFuture_;
     std::future<void> pancamCloudFuture_;
+    std::future<void> orbiterCloudFuture_;
 };
 
 }  // namespace ga_slam

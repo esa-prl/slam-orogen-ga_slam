@@ -51,7 +51,7 @@ void Task::poseGuessTransformerCallback(
 void Task::hazcamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseHazcamCloud) {
-    std::cout << "[GA SLAM] HazCam Cloud received!" << std::endl;
+    std::cout << "[GA SLAM] HazCam cloud received!" << std::endl;
 
     if (!isFutureReady(hazcamCloudFuture_)) return;
 
@@ -62,7 +62,7 @@ void Task::hazcamCloudTransformerCallback(
 void Task::loccamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& baseLoccamCloud) {
-    std::cout << "[GA SLAM] LocCam Cloud received!" << std::endl;
+    std::cout << "[GA SLAM] LocCam cloud received!" << std::endl;
 
     if (!isFutureReady(loccamCloudFuture_)) return;
 
@@ -73,7 +73,7 @@ void Task::loccamCloudTransformerCallback(
 void Task::pancamCloudTransformerCallback(
         const BaseTime& timestamp,
         const BaseCloud& basePancamCloud) {
-    std::cout << "[GA SLAM] PanCam Cloud received!" << std::endl;
+    std::cout << "[GA SLAM] PanCam cloud received!" << std::endl;
 
     if (_pancamTransformation.read(basePancamToBodyTF_) != RTT::NewData) return;
 
@@ -81,6 +81,27 @@ void Task::pancamCloudTransformerCallback(
 
     pancamCloudFuture_ = std::async(std::launch::async, &Task::cloudCallback,
             this, basePancamCloud, basePancamToBodyTF_.getTransform());
+}
+
+void Task::orbiterCloudTransformerCallback(
+        const BaseTime& timestamp,
+        const BaseCloud& baseOrbiterCloud) {
+    std::cout << "[GA SLAM] Orbiter cloud received!" << std::endl;
+
+    if (!isFutureReady(orbiterCloudFuture_)) return;
+
+    orbiterCloudFuture_ = std::async(std::launch::async, [&] {
+        Cloud::Ptr cloud(new Cloud);
+        GaSlamBaseConverter::convertBaseCloudToPCL(baseOrbiterCloud, cloud);
+
+        gaSlam_.registerOrbiterCloud(cloud);
+
+        if (_debugInfoEnabled.rvalue() && _serializationDebugEnabled.rvalue()) {
+            std::lock_guard<std::mutex> guard(gaSlam_.getGlobalMapMutex());
+            saveGridMap(gaSlam_.getGlobalMap().getGridMap(),
+                    _globalMapPath.rvalue());
+        }
+    });
 }
 
 void Task::cloudCallback(
@@ -118,10 +139,10 @@ void Task::outputDebugInfo(void) {
     }
 
     if (_serializationDebugEnabled.rvalue()) {
-        savePose(gaSlam_.getPose(), _savePosePath.rvalue());
+        savePose(gaSlam_.getPose(), _posePath.rvalue());
 
         std::lock_guard<std::mutex> guard(gaSlam_.getRawMapMutex());
-        saveGridMap(gaSlam_.getRawMap().getGridMap(), _saveMapPath.rvalue());
+        saveGridMap(gaSlam_.getRawMap().getGridMap(), _localMapPath.rvalue());
     }
 }
 
