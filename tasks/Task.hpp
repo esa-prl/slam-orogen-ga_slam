@@ -22,25 +22,7 @@ class Task : public TaskBase {
     bool configureHook(void) override;
 
   protected:
-    void poseGuessTransformerCallback(
-            const BaseTime& timestamp,
-            const BasePose& basePoseGuess) override;
-
-    void hazcamCloudTransformerCallback(
-            const BaseTime& timestamp,
-            const BaseCloud& baseHazcamCloud) override;
-
-    void loccamCloudTransformerCallback(
-            const BaseTime& timestamp,
-            const BaseCloud& baseLoccamCloud) override;
-
-    void pancamCloudTransformerCallback(
-            const BaseTime& timestamp,
-            const BaseCloud& basePancamCloud) override;
-
-    void orbiterCloudTransformerCallback(
-            const BaseTime& timestamp,
-            const BaseCloud& baseOrbiterCloud) override;
+    void updateHook(void) override;
 
     void cloudCallback(
         const BaseCloud& baseCloud,
@@ -61,6 +43,12 @@ class Task : public TaskBase {
     Pose bodyToGroundTF_;
     Pose hazcamToBodyTF_;
     Pose loccamToBodyTF_;
+
+    BasePose poseGuess_;
+    BaseCloud hazcamCloud_;
+    BaseCloud loccamCloud_;
+    BaseCloud pancamCloud_;
+    BaseCloud orbiterCloud_;
     BasePose basePancamToBodyTF_;
 
     std::future<void> poseGuessFuture_;
