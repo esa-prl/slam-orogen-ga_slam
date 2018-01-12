@@ -44,8 +44,6 @@ void Task::updateHook(void) {
 
     if (isFutureReady(poseGuessFuture_) &&
             _poseGuess.read(poseGuess_) == RTT::NewData) {
-        std::cout << "[GA SLAM] Pose received!" << std::endl;
-
         poseGuessFuture_ = std::async(std::launch::async, &GaSlam::poseCallback,
                 &gaSlam_, poseGuess_.getTransform(), bodyToGroundTF_);
     }

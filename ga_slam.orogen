@@ -3,6 +3,7 @@ name 'ga_slam'
 using_library 'ga_slam'
 using_library 'grid_map_cereal'
 using_library 'pcl_common-1.7'
+using_library 'opencv'
 
 import_types_from 'base'
 
@@ -119,6 +120,6 @@ task_context 'Task' do
         max_latency 0
     end
 
-    periodic 0.1
+    periodic 0.5
 end
 
