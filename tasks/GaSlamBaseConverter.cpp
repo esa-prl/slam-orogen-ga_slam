@@ -29,17 +29,20 @@ void GaSlamBaseConverter::convertMapToBaseImage(
         BaseImage& image,
         const Map& map) {
     const auto params = map.getParameters();
+    const auto meanData = map.getMeanZ();
 
     image.width = params.sizeX;
     image.height = params.sizeY;
     image.data.clear();
-    image.data.reserve(image.width * image.height);
+    image.data.resize(image.width * image.height, NAN);
     image.time.fromMicroseconds(map.getTimestamp());
 
-    const auto& meanData = map.getMeanZ();
-
-    for (auto&& it = map.begin(); !it.isPastEnd(); ++it)
-        image.data.push_back(meanData(it.getLinearIndex()));
+    for (auto&& it = map.begin(); !it.isPastEnd(); ++it) {
+        const grid_map::Index index(*it);
+        const grid_map::Index imageIndex(it.getUnwrappedIndex());
+        const float value = meanData(index(0), index(1));
+        image.data[imageIndex(0) * image.height + imageIndex(1)] = value;
+    }
 }
 
 void GaSlamBaseConverter::convertMapToBaseCloud(
