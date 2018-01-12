@@ -34,7 +34,8 @@ bool Task::configureHook(void) {
             _numParticles.rvalue(), _resampleFrequency.rvalue(),
             _initialSigmaX.rvalue(), _initialSigmaY.rvalue(),
             _initialSigmaYaw.rvalue(), _predictSigmaX.rvalue(),
-            _predictSigmaY.rvalue(), _predictSigmaYaw.rvalue());
+            _predictSigmaY.rvalue(), _predictSigmaYaw.rvalue(),
+            _traversedDistanceThreshold.rvalue(), _slopeSumThreshold.rvalue());
 
     return true;
 }

@@ -53,6 +53,13 @@ task_context 'Task' do
     property('predictSigmaYaw', 'double', Math::PI/18).
         doc 'Sigma of gaussian distribution of yaw for particle prediction'
 
+    property('traversedDistanceThreshold', 'double', 5.0).
+        doc 'Distance the robot must traverse before a new pose correction'
+
+    property('slopeSumThreshold', 'double', 10.0).
+        doc 'Slope sum of local elevation map that determines if the map has ' +
+            'enough features for map matching'
+
     ####### States #######
     error_states 'TRANSFORM_NOT_FOUND'
 
