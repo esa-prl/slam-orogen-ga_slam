@@ -19,7 +19,7 @@ void GaSlamBaseConverter::convertPCLToBaseCloud(
         const Cloud::ConstPtr& pclCloud) {
     baseCloud.points.clear();
     baseCloud.points.reserve(pclCloud->size());
-    baseCloud.time.fromMicroseconds(pclCloud->header.stamp);
+    baseCloud.time = BaseTime::fromMicroseconds(pclCloud->header.stamp);
 
     for (const auto& point : pclCloud->points)
         baseCloud.points.push_back(base::Point(point.x, point.y, point.z));
@@ -35,7 +35,7 @@ void GaSlamBaseConverter::convertMapToBaseImage(
     image.height = params.sizeY;
     image.data.clear();
     image.data.resize(image.width * image.height, NAN);
-    image.time.fromMicroseconds(map.getTimestamp());
+    image.time = BaseTime::fromMicroseconds(map.getTimestamp());
 
     for (auto&& it = map.begin(); !it.isPastEnd(); ++it) {
         const grid_map::Index index(*it);
@@ -52,7 +52,7 @@ void GaSlamBaseConverter::convertMapToBaseCloud(
 
     baseCloud.points.clear();
     baseCloud.points.reserve(params.sizeX * params.sizeY);
-    baseCloud.time.fromMicroseconds(map.getTimestamp());
+    baseCloud.time = BaseTime::fromMicroseconds(map.getTimestamp());
 
     const auto& meanData = map.getMeanZ();
     Eigen::Vector3d point;
