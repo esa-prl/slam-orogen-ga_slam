@@ -56,9 +56,14 @@ task_context 'Task' do
     property('traversedDistanceThreshold', 'double', 5.0).
         doc 'Distance the robot must traverse before a new pose correction'
 
-    property('slopeSumThreshold', 'double', 10.0).
-        doc 'Slope sum of local elevation map that determines if the map has ' +
-            'enough features for map matching'
+    property('minSlopeThreshold', 'double', 0.5).
+        doc 'Minimum slope (in radians) a cell of the map needs to have ' +
+            'to be considered as an elevation feature'
+
+    property('slopeSumThresholdMultiplier', 'double', 10.0).
+        doc 'Divided by the resolution of the map to produce the ' +
+            'slope sum threshold, which determines if the map has enough ' +
+            'elevation features for map matching (e.g. 10/0.05 > sum(slopes))'
 
     ####### States #######
     error_states 'TRANSFORM_NOT_FOUND'

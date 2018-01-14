@@ -35,7 +35,8 @@ bool Task::configureHook(void) {
             _initialSigmaX.rvalue(), _initialSigmaY.rvalue(),
             _initialSigmaYaw.rvalue(), _predictSigmaX.rvalue(),
             _predictSigmaY.rvalue(), _predictSigmaYaw.rvalue(),
-            _traversedDistanceThreshold.rvalue(), _slopeSumThreshold.rvalue());
+            _traversedDistanceThreshold.rvalue(), _minSlopeThreshold.rvalue(),
+            _slopeSumThresholdMultiplier.rvalue());
 
     return true;
 }
