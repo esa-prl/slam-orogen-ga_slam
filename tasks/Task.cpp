@@ -28,7 +28,7 @@ bool Task::configureHook(void) {
         return false;
     }
 
-    gaSlam_.setParameters(_mapLengthX.rvalue(), _mapLengthY.rvalue(),
+    gaSlam_.configure(_mapLengthX.rvalue(), _mapLengthY.rvalue(),
             _mapResolution.rvalue(), _minElevation.rvalue(),
             _maxElevation.rvalue(), _voxelSize.rvalue(),
             _numParticles.rvalue(), _resampleFrequency.rvalue(),
