@@ -1,6 +1,7 @@
 name 'ga_slam'
 
 using_library 'ga_slam'
+using_library 'grid_map_core'
 using_library 'grid_map_cereal'
 using_library 'pcl_common-1.7'
 using_library 'opencv'
