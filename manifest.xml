@@ -3,9 +3,7 @@
   This component acts as a bridge between Rock and the GA SLAM library. It transforms and converts the inputs to the non-Rock data types of the library.
   </description>
   <author>Dimitris Geromichalos/geromidg@gmail.com</author>
-  <license></license>
-  <url>http://</url>
-  <logo>http://</logo>
+
   <depend package="base/cmake" />
   <depend package="base/types" />
   <depend package="base/orogen/types" />
@@ -15,5 +13,7 @@
   <depend package="slam/ga_slam" />
   <depend package="slam/pcl" />
   <depend package="slam/orogen/pcl" />
+
+  <tags>needs_opt</tags>
 </package>
 
