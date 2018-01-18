@@ -66,6 +66,12 @@ task_context 'Task' do
             'slope sum threshold, which determines if the map has enough ' +
             'elevation features for map matching (e.g. 10/0.05 > sum(slopes))'
 
+    property('orbiterMapLength', 'double', 100.0).
+        doc 'Size of one dimension of the desired orbiter map in meters'
+
+    property('orbiterMapResolution', 'double', 1.0).
+        doc 'Resolution of the desired orbiter orbiter map in meters'
+
     ####### States #######
     error_states 'TRANSFORM_NOT_FOUND'
 

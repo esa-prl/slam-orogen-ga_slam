@@ -19,9 +19,9 @@ class Task : public TaskBase {
             : TaskBase(name),
               gaSlam_() {}
 
+  protected:
     bool configureHook(void) override;
 
-  protected:
     void updateHook(void) override;
 
     void cloudCallback(
@@ -43,13 +43,15 @@ class Task : public TaskBase {
     Pose bodyToGroundTF_;
     Pose hazcamToBodyTF_;
     Pose loccamToBodyTF_;
+    BasePose basePancamToBodyTF_;
 
     BasePose poseGuess_;
+
     BaseCloud hazcamCloud_;
     BaseCloud loccamCloud_;
     BaseCloud pancamCloud_;
+
     BaseCloud orbiterCloud_;
-    BasePose basePancamToBodyTF_;
 
     std::future<void> poseGuessFuture_;
     std::future<void> hazcamCloudFuture_;

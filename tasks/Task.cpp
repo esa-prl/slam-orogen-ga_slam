@@ -36,7 +36,8 @@ bool Task::configureHook(void) {
             _initialSigmaYaw.rvalue(), _predictSigmaX.rvalue(),
             _predictSigmaY.rvalue(), _predictSigmaYaw.rvalue(),
             _traversedDistanceThreshold.rvalue(), _minSlopeThreshold.rvalue(),
-            _slopeSumThresholdMultiplier.rvalue());
+            _slopeSumThresholdMultiplier.rvalue(), _orbiterMapLength.rvalue(),
+            _orbiterMapResolution.rvalue());
 
     return true;
 }
@@ -83,7 +84,7 @@ void Task::updateHook(void) {
         orbiterCloudFuture_ = std::async(std::launch::async, [&] {
             Cloud::Ptr cloud(new Cloud);
             GaSlamBaseConverter::convertBaseCloudToPCL(orbiterCloud_, cloud);
-            gaSlam_.registerOrbiterCloud(cloud);
+            gaSlam_.createGlobalMap(cloud);
         });
     }
 
