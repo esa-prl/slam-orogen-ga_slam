@@ -91,6 +91,9 @@ task_context 'Task' do
     input_port('orbiterCloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud from the orbiter'
 
+    input_port('orbiterCloudPose', '/base/samples/RigidBodyState').
+        doc 'Pose of point cloud from the orbiter'
+
     ####### Output Ports #######
     output_port('elevationMap', '/base/samples/DistanceImage').
         doc 'Robot-centric elevation map (2.5D space representation)'

@@ -46,11 +46,11 @@ class Task : public TaskBase {
     BasePose basePancamToBodyTF_;
 
     BasePose poseGuess_;
-
     BaseCloud hazcamCloud_;
     BaseCloud loccamCloud_;
     BaseCloud pancamCloud_;
 
+    BasePose orbiterCloudPose_;
     BaseCloud orbiterCloud_;
 
     std::future<void> poseGuessFuture_;

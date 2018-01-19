@@ -77,13 +77,14 @@ void Task::updateHook(void) {
     }
 
     if (isFutureReady(orbiterCloudFuture_) &&
-            _orbiterCloud.read(orbiterCloud_) == RTT::NewData) {
+            _orbiterCloud.read(orbiterCloud_) == RTT::NewData &&
+            _orbiterCloudPose.read(orbiterCloudPose_) == RTT::NewData) {
         std::cout << "[GA SLAM] Orbiter cloud received!" << std::endl;
 
         orbiterCloudFuture_ = std::async(std::launch::async, [&] {
             Cloud::Ptr cloud(new Cloud);
             GaSlamBaseConverter::convertBaseCloudToPCL(orbiterCloud_, cloud);
-            gaSlam_.createGlobalMap(cloud);
+            gaSlam_.createGlobalMap(cloud, orbiterCloudPose_.getTransform());
         });
     }
 
