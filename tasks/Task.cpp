@@ -28,9 +28,8 @@ bool Task::configureHook(void) {
         return false;
     }
 
-    gaSlam_.configure(_mapLengthX.rvalue(), _mapLengthY.rvalue(),
-            _mapResolution.rvalue(), _minElevation.rvalue(),
-            _maxElevation.rvalue(), _voxelSize.rvalue(),
+    gaSlam_.configure(_mapLength.rvalue(), _mapResolution.rvalue(),
+            _minElevation.rvalue(), _maxElevation.rvalue(), _voxelSize.rvalue(),
             _numParticles.rvalue(), _resampleFrequency.rvalue(),
             _initialSigmaX.rvalue(), _initialSigmaY.rvalue(),
             _initialSigmaYaw.rvalue(), _predictSigmaX.rvalue(),

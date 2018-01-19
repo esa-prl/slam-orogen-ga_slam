@@ -12,11 +12,8 @@ task_context 'Task' do
     needs_configuration
 
     ####### Properties #######
-    property('mapLengthX', 'double', 10.0).
-        doc 'X dimension of the map'
-
-    property('mapLengthY', 'double', 10.0).
-        doc 'Y dimension of the map'
+    property('mapLength', 'double', 10.0).
+        doc 'Size of one dimension of the map in meters'
 
     property('mapResolution', 'double', 0.05).
         doc 'Resolution of each square cell of the map'

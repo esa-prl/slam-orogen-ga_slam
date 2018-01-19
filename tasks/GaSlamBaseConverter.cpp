@@ -31,8 +31,8 @@ void GaSlamBaseConverter::convertMapToBaseImage(
     const auto params = map.getParameters();
     const auto meanData = map.getMeanZ();
 
-    image.width = params.sizeX;
-    image.height = params.sizeY;
+    image.width = params.size;
+    image.height = params.size;
     image.data.clear();
     image.data.resize(image.width * image.height, NAN);
     image.time = BaseTime::fromMicroseconds(map.getTimestamp());
@@ -51,7 +51,7 @@ void GaSlamBaseConverter::convertMapToBaseCloud(
     const auto params = map.getParameters();
 
     baseCloud.points.clear();
-    baseCloud.points.reserve(params.sizeX * params.sizeY);
+    baseCloud.points.reserve(params.size * params.size);
     baseCloud.time = BaseTime::fromMicroseconds(map.getTimestamp());
 
     const auto& meanData = map.getMeanZ();
