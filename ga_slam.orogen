@@ -63,6 +63,10 @@ task_context 'Task' do
             'slope sum threshold, which determines if the map has enough ' +
             'elevation features for map matching (e.g. 10/0.05 > sum(slopes))'
 
+    property('matchAcceptanceThreshold', 'double', 0.9).
+        doc 'Minimum score the matched position from template matching ' +
+            'must have, in order for the matching to be accepted'
+
     property('orbiterMapLength', 'double', 100.0).
         doc 'Size of one dimension of the desired orbiter map in meters'
 
