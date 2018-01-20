@@ -71,14 +71,14 @@ task_context 'Task' do
         doc 'Size of one dimension of the desired orbiter map in meters'
 
     property('orbiterMapResolution', 'double', 1.0).
-        doc 'Resolution of the desired orbiter orbiter map in meters'
+        doc 'Resolution of the desired orbiter map in meters'
 
     ####### States #######
     error_states 'TRANSFORM_NOT_FOUND'
 
     ####### Input Ports #######
-    input_port('poseGuess', '/base/samples/RigidBodyState').
-        doc 'Pose estimation (6D) with covariance and timestamp'
+    input_port('odometryDeltaPose', '/base/samples/RigidBodyState').
+        doc 'Delta estimation of pose (6D) with covariance and timestamp'
 
     input_port('hazcamCloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud with timestamp in the sensor (HazCam) frame'

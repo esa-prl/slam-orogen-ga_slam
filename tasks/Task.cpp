@@ -45,10 +45,11 @@ bool Task::configureHook(void) {
 void Task::updateHook(void) {
     TaskBase::updateHook();
 
-    if (isFutureReady(poseGuessFuture_) &&
-            _poseGuess.read(poseGuess_) == RTT::NewData) {
-        poseGuessFuture_ = std::async(std::launch::async, &GaSlam::poseCallback,
-                &gaSlam_, poseGuess_.getTransform(), bodyToGroundTF_);
+    if (isFutureReady(odometryDeltaPoseFuture_) &&
+            _odometryDeltaPose.read(odometryDeltaPose_) == RTT::NewData) {
+        odometryDeltaPoseFuture_ = std::async(std::launch::async,
+                &GaSlam::poseCallback, &gaSlam_,
+                odometryDeltaPose_.getTransform(), bodyToGroundTF_);
     }
 
     if (isFutureReady(hazcamCloudFuture_) &&
