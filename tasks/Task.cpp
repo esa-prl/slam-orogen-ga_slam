@@ -37,7 +37,7 @@ bool Task::configureHook(void) {
             _traversedDistanceThreshold.rvalue(), _minSlopeThreshold.rvalue(),
             _slopeSumThresholdMultiplier.rvalue(),
             _matchAcceptanceThreshold.rvalue(), _orbiterMapLength.rvalue(),
-            _orbiterMapResolution.rvalue());
+            _orbiterMapResolution.rvalue(), bodyToGroundTF_);
 
     return true;
 }
@@ -49,7 +49,7 @@ void Task::updateHook(void) {
             _odometryDeltaPose.read(odometryDeltaPose_) == RTT::NewData) {
         odometryDeltaPoseFuture_ = std::async(std::launch::async,
                 &GaSlam::poseCallback, &gaSlam_,
-                odometryDeltaPose_.getTransform(), bodyToGroundTF_);
+                odometryDeltaPose_.getTransform());
     }
 
     if (isFutureReady(hazcamCloudFuture_) &&

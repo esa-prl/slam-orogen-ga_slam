@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ga_slam/TaskBase.hpp"
-#include "ga_slam/GaSlam.hpp"
+#include "ga_slam/GaSlam.h"
 
 #include <chrono>
 #include <future>
