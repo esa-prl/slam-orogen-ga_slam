@@ -10,12 +10,6 @@ namespace ga_slam {
 bool Task::configureHook(void) {
     if (!TaskBase::configureHook()) return false;
 
-    if (!_body2ground.get(BaseTime::now(), bodyToGroundTF_, false)) {
-        RTT::log(RTT::Error) << "Body to ground TF not found" << RTT::endlog();
-        error(TRANSFORM_NOT_FOUND);
-        return false;
-    }
-
     if (!_hazcam2body.get(BaseTime::now(), hazcamToBodyTF_, false)) {
         RTT::log(RTT::Error) << "HazCam to body TF not found" << RTT::endlog();
         error(TRANSFORM_NOT_FOUND);
@@ -37,7 +31,7 @@ bool Task::configureHook(void) {
             _traversedDistanceThreshold.rvalue(), _minSlopeThreshold.rvalue(),
             _slopeSumThresholdMultiplier.rvalue(),
             _matchAcceptanceThreshold.rvalue(), _orbiterMapLength.rvalue(),
-            _orbiterMapResolution.rvalue(), bodyToGroundTF_);
+            _orbiterMapResolution.rvalue());
 
     return true;
 }

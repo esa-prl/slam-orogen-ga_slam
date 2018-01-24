@@ -40,7 +40,6 @@ class Task : public TaskBase {
   protected:
     GaSlam gaSlam_;
 
-    Pose bodyToGroundTF_;
     Pose hazcamToBodyTF_;
     Pose loccamToBodyTF_;
     BasePose basePancamToBodyTF_;

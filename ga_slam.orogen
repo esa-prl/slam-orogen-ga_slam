@@ -138,7 +138,6 @@ task_context 'Task' do
     transformer do
         transform 'hazcam', 'body'
         transform 'loccam', 'body'
-        transform 'body', 'ground'
 
         max_latency 0
     end
