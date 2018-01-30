@@ -1,8 +1,8 @@
 name 'ga_slam'
 
 using_library 'ga_slam'
+using_library 'ga_slam_cereal'
 using_library 'grid_map_core'
-using_library 'grid_map_cereal'
 using_library 'pcl_common-1.7'
 using_library 'opencv'
 
@@ -125,8 +125,12 @@ task_context 'Task' do
     property('globalMapPath', '/std/string', '/tmp/ga_slam_global_map.cereal').
         doc 'Path to save the serialized global elevation map'
 
-    property('posePath', '/std/string', '/tmp/ga_slam_pose.cereal').
-        doc 'Path to save the serialized pose'
+    property('slamPosePath', '/std/string', '/tmp/ga_slam_slam_pose.cereal').
+        doc 'Path to save the serialized pose estimated by SLAM'
+
+    property('globalPosePath', '/std/string',
+            '/tmp/ga_slam_global_pose.cereal').
+        doc 'Path to save the serialized global pose'
 
     output_port('rawElevationMap', '/base/samples/DistanceImage').
         doc 'Elevation map prior to the neighborhood fusion step'

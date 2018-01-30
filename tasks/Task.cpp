@@ -1,7 +1,7 @@
 #include "Task.hpp"
 #include "GaSlamBaseConverter.hpp"
 
-#include "grid_map_cereal/GridMapCereal.hpp"
+#include "ga_slam_cereal/GridMapCereal.h"
 
 #include <mutex>
 
@@ -73,8 +73,8 @@ void Task::updateHook(void) {
     }
 
     if (isFutureReady(orbiterCloudFuture_) &&
-            _orbiterCloud.read(orbiterCloud_) == RTT::NewData &&
-            _orbiterCloudPose.read(orbiterCloudPose_) == RTT::NewData) {
+            _orbiterCloudPose.read(orbiterCloudPose_) == RTT::NewData &&
+            _orbiterCloud.read(orbiterCloud_) == RTT::NewData) {
         std::cout << "[GA SLAM] Orbiter cloud received!" << std::endl;
 
         orbiterCloudFuture_ = std::async(std::launch::async, [&] {
@@ -120,7 +120,9 @@ void Task::outputDebugInfo(void) {
     }
 
     if (_serializationDebugEnabled.rvalue()) {
-        savePose(gaSlam_.getPose(), _posePath.rvalue());
+        savePose(gaSlam_.getPose(), _slamPosePath.rvalue());
+
+        savePose(orbiterCloudPose_, _globalPosePath.rvalue());
 
         std::unique_lock<std::mutex> rawMapGuard(gaSlam_.getRawMapMutex());
         saveGridMap(gaSlam_.getRawMap().getGridMap(), _localMapPath.rvalue());
