@@ -132,6 +132,11 @@ task_context 'Task' do
             '/tmp/ga_slam_global_pose.cereal').
         doc 'Path to save the serialized global pose'
 
+    property('particlesArrayPath', '/std/string',
+            '/tmp/ga_slam_particles_array.cereal').
+        doc 'Path to save the serialized array containing the particles from ' +
+            'the particle filter'
+
     output_port('rawElevationMap', '/base/samples/DistanceImage').
         doc 'Elevation map prior to the neighborhood fusion step'
 

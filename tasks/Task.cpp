@@ -124,6 +124,8 @@ void Task::outputDebugInfo(void) {
 
         savePose(orbiterCloudPose_, _globalPosePath.rvalue());
 
+        saveArray(gaSlam_.getParticlesArray(), _particlesArrayPath.rvalue());
+
         std::unique_lock<std::mutex> rawMapGuard(gaSlam_.getRawMapMutex());
         saveGridMap(gaSlam_.getRawMap().getGridMap(), _localMapPath.rvalue());
         rawMapGuard.unlock();
