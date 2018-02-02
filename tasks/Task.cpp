@@ -39,11 +39,14 @@ bool Task::configureHook(void) {
 void Task::updateHook(void) {
     TaskBase::updateHook();
 
-    if (isFutureReady(odometryDeltaPoseFuture_) &&
-            _odometryDeltaPose.read(odometryDeltaPose_) == RTT::NewData) {
-        odometryDeltaPoseFuture_ = std::async(std::launch::async,
-                &GaSlam::poseCallback, &gaSlam_,
-                odometryDeltaPose_.getTransform());
+    if (isFutureReady(odometryPoseFuture_) &&
+            _odometryPose.read(baseOdometryPose_) == RTT::NewData) {
+        Pose odometryPose = baseOdometryPose_.getTransform();
+        Pose odometryDeltaPose = lastOdometryPose_.inverse() * odometryPose;
+        lastOdometryPose_ = odometryPose;
+
+        odometryPoseFuture_ = std::async(std::launch::async,
+                &GaSlam::poseCallback, &gaSlam_, odometryDeltaPose);
     }
 
     if (isFutureReady(hazcamCloudFuture_) &&
@@ -122,7 +125,7 @@ void Task::outputDebugInfo(void) {
     if (_serializationDebugEnabled.rvalue()) {
         savePose(gaSlam_.getPose(), _slamPosePath.rvalue());
 
-        savePose(orbiterCloudPose_, _globalPosePath.rvalue());
+        savePose(orbiterCloudPose_.getTransform(), _globalPosePath.rvalue());
 
         saveArray(gaSlam_.getParticlesArray(), _particlesArrayPath.rvalue());
 

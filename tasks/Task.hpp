@@ -17,7 +17,9 @@ class Task : public TaskBase {
   public:
     explicit Task(std::string const& name = "ga_slam::Task")
             : TaskBase(name),
-              gaSlam_() {}
+              gaSlam_(),
+              lastOdometryPose_(Pose::Identity()),
+              orbiterCloudPose_(false) {}
 
   protected:
     bool configureHook(void) override;
@@ -44,7 +46,9 @@ class Task : public TaskBase {
     Pose loccamToBodyTF_;
     BasePose basePancamToBodyTF_;
 
-    BasePose odometryDeltaPose_;
+    BasePose baseOdometryPose_;
+    Pose lastOdometryPose_;
+
     BaseCloud hazcamCloud_;
     BaseCloud loccamCloud_;
     BaseCloud pancamCloud_;
@@ -52,7 +56,7 @@ class Task : public TaskBase {
     BasePose orbiterCloudPose_;
     BaseCloud orbiterCloud_;
 
-    std::future<void> odometryDeltaPoseFuture_;
+    std::future<void> odometryPoseFuture_;
     std::future<void> hazcamCloudFuture_;
     std::future<void> loccamCloudFuture_;
     std::future<void> pancamCloudFuture_;

@@ -77,8 +77,8 @@ task_context 'Task' do
     error_states 'TRANSFORM_NOT_FOUND'
 
     ####### Input Ports #######
-    input_port('odometryDeltaPose', '/base/samples/RigidBodyState').
-        doc 'Delta estimation of pose (6D) with covariance and timestamp'
+    input_port('odometryPose', '/base/samples/RigidBodyState').
+        doc 'Odometry estimation of pose (6D) with covariance and timestamp'
 
     input_port('hazcamCloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud with timestamp in the sensor (HazCam) frame'
