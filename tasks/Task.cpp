@@ -50,50 +50,36 @@ void Task::updateHook(void) {
     }
 
     if (isFutureReady(imuOrientationFuture_) &&
-            _imuOrientation.read(baseImuOrientation_) == RTT::NewData) {
-        Pose imuOrientation = baseImuOrientation_.getTransform();
-
+            _imuOrientation.read(baseImuOrientation_) == RTT::NewData)
         imuOrientationFuture_ = std::async(std::launch::async,
-                &GaSlam::imuCallback, &gaSlam_, imuOrientation);
-    }
+                &GaSlam::imuCallback, &gaSlam_,
+                baseImuOrientation_.getTransform());
 
     if (isFutureReady(hazcamCloudFuture_) &&
-            _hazcamCloud.read(hazcamCloud_) == RTT::NewData) {
-        std::cout << "[GA SLAM] HazCam cloud received!" << std::endl;
-
+            _hazcamCloud.read(hazcamCloud_) == RTT::NewData)
         hazcamCloudFuture_ = std::async(std::launch::async,
                 &Task::cloudCallback, this, hazcamCloud_, hazcamToBodyTF_);
-    }
 
     if (isFutureReady(loccamCloudFuture_) &&
-            _loccamCloud.read(loccamCloud_) == RTT::NewData) {
-        std::cout << "[GA SLAM] LocCam cloud received!" << std::endl;
-
+            _loccamCloud.read(loccamCloud_) == RTT::NewData)
         loccamCloudFuture_ = std::async(std::launch::async,
                 &Task::cloudCallback, this, loccamCloud_, loccamToBodyTF_);
-    }
 
     if (isFutureReady(pancamCloudFuture_) &&
             _pancamCloud.read(pancamCloud_) == RTT::NewData &&
-            _pancamTransformation.read(basePancamToBodyTF_) == RTT::NewData) {
-        std::cout << "[GA SLAM] PanCam cloud received!" << std::endl;
-
+            _pancamTransformation.read(basePancamToBodyTF_) == RTT::NewData)
         pancamCloudFuture_ = std::async(std::launch::async,
                 &Task::cloudCallback, this, pancamCloud_,
                 basePancamToBodyTF_.getTransform());
-    }
 
     if (isFutureReady(orbiterCloudFuture_) &&
             _orbiterCloudPose.read(orbiterCloudPose_) == RTT::NewData &&
-            _orbiterCloud.read(orbiterCloud_) == RTT::NewData) {
-        std::cout << "[GA SLAM] Orbiter cloud received!" << std::endl;
-
+            _orbiterCloud.read(orbiterCloud_) == RTT::NewData)
         orbiterCloudFuture_ = std::async(std::launch::async, [&] {
             Cloud::Ptr cloud(new Cloud);
             GaSlamBaseConverter::convertBaseCloudToPCL(orbiterCloud_, cloud);
             gaSlam_.createGlobalMap(cloud, orbiterCloudPose_.getTransform());
         });
-    }
 
     if (_debugInfoEnabled.rvalue()) outputDebugInfo();
 }
