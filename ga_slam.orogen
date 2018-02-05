@@ -80,6 +80,9 @@ task_context 'Task' do
     input_port('odometryPose', '/base/samples/RigidBodyState').
         doc 'Odometry estimation of pose (6D) with covariance and timestamp'
 
+    input_port('imuOrientation', '/base/samples/RigidBodyState').
+        doc 'Orientation from the IMU sensor with covariance and timestamp'
+
     input_port('hazcamCloud', '/base/samples/Pointcloud').
         doc 'Dense point cloud with timestamp in the sensor (HazCam) frame'
 

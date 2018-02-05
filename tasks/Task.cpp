@@ -49,6 +49,14 @@ void Task::updateHook(void) {
                 &GaSlam::poseCallback, &gaSlam_, odometryDeltaPose);
     }
 
+    if (isFutureReady(imuOrientationFuture_) &&
+            _imuOrientation.read(baseImuOrientation_) == RTT::NewData) {
+        Pose imuOrientation = baseImuOrientation_.getTransform();
+
+        imuOrientationFuture_ = std::async(std::launch::async,
+                &GaSlam::imuCallback, &gaSlam_, imuOrientation);
+    }
+
     if (isFutureReady(hazcamCloudFuture_) &&
             _hazcamCloud.read(hazcamCloud_) == RTT::NewData) {
         std::cout << "[GA SLAM] HazCam cloud received!" << std::endl;

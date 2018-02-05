@@ -47,6 +47,7 @@ class Task : public TaskBase {
     BasePose basePancamToBodyTF_;
 
     BasePose baseOdometryPose_;
+    BasePose baseImuOrientation_;
     Pose lastOdometryPose_;
 
     BaseCloud hazcamCloud_;
@@ -57,6 +58,7 @@ class Task : public TaskBase {
     BaseCloud orbiterCloud_;
 
     std::future<void> odometryPoseFuture_;
+    std::future<void> imuOrientationFuture_;
     std::future<void> hazcamCloudFuture_;
     std::future<void> loccamCloudFuture_;
     std::future<void> pancamCloudFuture_;
