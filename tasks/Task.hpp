@@ -30,7 +30,9 @@ class Task : public TaskBase {
         const BaseCloud& baseCloud,
         const Pose& sensorToBodyTF);
 
-    void outputDebugInfo(void);
+    void outputPortData(void);
+
+    void outputDebugData(void);
 
     template<typename T>
     bool isFutureReady(const std::future<T>& future) {

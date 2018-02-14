@@ -113,14 +113,11 @@ task_context 'Task' do
         doc 'Output debug information. This must be enabled for the' +
             'other debug properties to have an effect'
 
-    property('rawMapDebugEnabled', 'bool', false).
-        doc 'Output the raw elevation map'
-
     property('cloudDebugEnabled', 'bool', false).
         doc 'Output processed point cloud and map point cloud'
 
     property('serializationDebugEnabled', 'bool', false).
-        doc 'Serialize the raw and global maps and save them to disk'
+        doc 'Serialize the local and global maps and save them to disk'
 
     property('localMapPath', '/std/string', '/tmp/ga_slam_local_map.cereal').
         doc 'Path to save the serialized local elevation map'
@@ -140,11 +137,8 @@ task_context 'Task' do
         doc 'Path to save the serialized array containing the particles from ' +
             'the particle filter'
 
-    output_port('rawElevationMap', '/base/samples/DistanceImage').
-        doc 'Elevation map prior to the neighborhood fusion step'
-
     output_port('mapCloud', '/base/samples/Pointcloud').
-        doc 'Point cloud in the map frame created from the raw map'
+        doc 'Point cloud in the map frame created from the local map'
 
     ####### Transformer #######
     transformer do

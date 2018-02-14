@@ -81,7 +81,9 @@ void Task::updateHook(void) {
             gaSlam_.createGlobalMap(cloud, orbiterCloudPose_.getTransform());
         });
 
-    if (_debugInfoEnabled.rvalue()) outputDebugInfo();
+    outputPortData();
+
+    if (_debugInfoEnabled.rvalue()) outputDebugData();
 }
 
 void Task::cloudCallback(
@@ -93,24 +95,28 @@ void Task::cloudCallback(
     gaSlam_.cloudCallback(cloud, sensorToBodyTF);
 }
 
-void Task::outputDebugInfo(void) {
-    if (_rawMapDebugEnabled.rvalue()) {
-        BaseImage rawMapBaseImage;
+void Task::outputPortData(void) {
+        BaseImage elevationMapBaseImage;
 
-        std::unique_lock<std::mutex> guard(gaSlam_.getRawMapMutex());
-        GaSlamBaseConverter::convertMapToBaseImage(rawMapBaseImage,
-                gaSlam_.getRawMap());
+        std::unique_lock<std::mutex> guard(gaSlam_.getLocalMapMutex());
+        GaSlamBaseConverter::convertMapToBaseImage(elevationMapBaseImage,
+                gaSlam_.getLocalMap());
         guard.unlock();
 
-        _rawElevationMap.write(rawMapBaseImage);
-    }
+        BasePose estimatedPoseBase;
+        estimatedPoseBase.setTransform(gaSlam_.getPose());
 
+        _elevationMap.write(elevationMapBaseImage);
+        _estimatedPose.write(estimatedPoseBase);
+}
+
+void Task::outputDebugData(void) {
     if (_cloudDebugEnabled.rvalue()) {
         BaseCloud mapBaseCloud;
 
-        std::unique_lock<std::mutex> guard(gaSlam_.getRawMapMutex());
+        std::unique_lock<std::mutex> guard(gaSlam_.getLocalMapMutex());
         GaSlamBaseConverter::convertMapToBaseCloud(mapBaseCloud,
-                gaSlam_.getRawMap());
+                gaSlam_.getLocalMap());
         guard.unlock();
 
         _mapCloud.write(mapBaseCloud);
@@ -123,9 +129,9 @@ void Task::outputDebugInfo(void) {
 
         saveArray(gaSlam_.getParticlesArray(), _particlesArrayPath.rvalue());
 
-        std::unique_lock<std::mutex> rawMapGuard(gaSlam_.getRawMapMutex());
-        saveGridMap(gaSlam_.getRawMap().getGridMap(), _localMapPath.rvalue());
-        rawMapGuard.unlock();
+        std::unique_lock<std::mutex> localMapGuard(gaSlam_.getLocalMapMutex());
+        saveGridMap(gaSlam_.getLocalMap().getGridMap(), _localMapPath.rvalue());
+        localMapGuard.unlock();
 
         std::lock_guard<std::mutex> globalMapGuard(gaSlam_.getGlobalMapMutex());
         saveGridMap(gaSlam_.getGlobalMap().getGridMap(),
