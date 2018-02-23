@@ -76,6 +76,12 @@ task_context 'Task' do
         doc 'Minimum score the matched position from template matching ' +
             'must have, in order for the matching to be accepted'
 
+    property('matchYawRange', 'double', Math::PI/20).
+        doc 'Scan range of yaw angle in radians for the template matching'
+
+    property('matchYawStep', 'double', Math::PI/1).
+        doc 'Scan step of yaw angle in radians for the template matching'
+
     property('orbiterMapLength', 'double', 100.0).
         doc 'Size of one dimension of the desired orbiter map in meters'
 
