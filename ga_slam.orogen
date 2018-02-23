@@ -27,6 +27,15 @@ task_context 'Task' do
     property('voxelSize', 'double', 0.025).
         doc 'Dimension of each voxel of the point cloud'
 
+    property('depthSigmaCoeff1', 'double', 0.001).
+        doc 'First coefficient of the uncertainty equation of the depth sensor'
+
+    property('depthSigmaCoeff2', 'double', 0.0).
+        doc 'Second coefficient of the uncertainty equation of the depth sensor'
+
+    property('depthSigmaCoeff3', 'double', 0.01).
+        doc 'Third coefficient of the uncertainty equation of the depth sensor'
+
     property('numParticles', 'int', 100).
         doc 'Number of particles used in the particle filter'
 
