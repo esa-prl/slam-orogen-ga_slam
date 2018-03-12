@@ -32,8 +32,8 @@ bool Task::configureHook(void) {
             _predictSigmaY.rvalue(), _predictSigmaYaw.rvalue(),
             _traversedDistanceThreshold.rvalue(), _minSlopeThreshold.rvalue(),
             _slopeSumThresholdMultiplier.rvalue(),
-            _matchAcceptanceThreshold.rvalue(), _matchYawRange.rvalue(),
-            _matchYaw.rvalue(), _matchYawStep.rvalue(),
+            _matchAcceptanceThreshold.rvalue(), _matchYaw.rvalue(),
+            _matchYawStep.rvalue(), _matchYawRange.rvalue(),
             _orbiterMapLength.rvalue(), _orbiterMapResolution.rvalue());
 
     return true;

@@ -79,10 +79,10 @@ task_context 'Task' do
     property('matchYaw', 'bool', false).
         doc 'Whether to correct the yaw of the global pose'
 
-    property('matchYawRange', 'double', Math::PI/20).
+    property('matchYawRange', 'double', 20*Math::PI/180).
         doc 'Scan range of yaw angle in radians for the template matching'
 
-    property('matchYawStep', 'double', Math::PI/1).
+    property('matchYawStep', 'double', 1*Math::PI/180).
         doc 'Scan step of yaw angle in radians for the template matching'
 
     property('orbiterMapLength', 'double', 100.0).
