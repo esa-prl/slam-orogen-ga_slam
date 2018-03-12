@@ -76,6 +76,9 @@ task_context 'Task' do
         doc 'Minimum score the matched position from template matching ' +
             'must have, in order for the matching to be accepted'
 
+    property('matchYaw', 'bool', false).
+        doc 'Whether to correct the yaw of the global pose'
+
     property('matchYawRange', 'double', Math::PI/20).
         doc 'Scan range of yaw angle in radians for the template matching'
 

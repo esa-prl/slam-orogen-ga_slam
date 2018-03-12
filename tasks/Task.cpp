@@ -33,8 +33,8 @@ bool Task::configureHook(void) {
             _traversedDistanceThreshold.rvalue(), _minSlopeThreshold.rvalue(),
             _slopeSumThresholdMultiplier.rvalue(),
             _matchAcceptanceThreshold.rvalue(), _matchYawRange.rvalue(),
-            _matchYawStep.rvalue(), _orbiterMapLength.rvalue(),
-            _orbiterMapResolution.rvalue());
+            _matchYaw.rvalue(), _matchYawStep.rvalue(),
+            _orbiterMapLength.rvalue(), _orbiterMapResolution.rvalue());
 
     return true;
 }
