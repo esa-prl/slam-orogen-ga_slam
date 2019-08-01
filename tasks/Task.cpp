@@ -111,6 +111,9 @@ void Task::outputPortData(void) {
 
         _elevationMap.write(elevationMapBaseImage);
         _estimatedPose.write(estimatedPoseBase);
+
+        double estimationError = sqrt(pow(estimatedPoseBase.position.x()-orbiterCloudPose_.position.x(),2) + pow(estimatedPoseBase.position.y()-orbiterCloudPose_.position.y(),2));
+        _estimationError.write(estimationError);
 }
 
 void Task::outputDebugData(void) {
@@ -126,6 +129,8 @@ void Task::outputDebugData(void) {
     }
 
     if (_serializationDebugEnabled.rvalue()) {
+        savePose(lastOdometryPose_, _odometryPosePath.rvalue());
+
         savePose(gaSlam_.getPose(), _slamPosePath.rvalue());
 
         savePose(orbiterCloudPose_.getTransform(), _globalPosePath.rvalue());

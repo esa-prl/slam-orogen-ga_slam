@@ -126,6 +126,10 @@ task_context 'Task' do
     output_port('estimatedPose', '/base/samples/RigidBodyState').
         doc 'Corrected pose estimation (6D) with covariance and timestamp'
 
+    output_port('estimationError', 'double').
+        doc 'absolute pose estimation error (norm of XY error vector)'
+
+
     ####### Debug Ports #######
     property('debugInfoEnabled', 'bool', false).
         doc 'Output debug information. This must be enabled for the' +
@@ -142,6 +146,9 @@ task_context 'Task' do
 
     property('globalMapPath', '/std/string', '/tmp/ga_slam_global_map.cereal').
         doc 'Path to save the serialized global elevation map'
+
+    property('odometryPosePath', '/std/string', '/tmp/ga_slam_odometry_pose.cereal').
+        doc 'Path to save the serialized pose estimated by odometry'
 
     property('slamPosePath', '/std/string', '/tmp/ga_slam_slam_pose.cereal').
         doc 'Path to save the serialized pose estimated by SLAM'
