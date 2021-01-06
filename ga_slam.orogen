@@ -120,8 +120,11 @@ task_context 'Task' do
         doc 'Pose of point cloud from the orbiter'
 
     ####### Output Ports #######
-    output_port('elevationMap', '/base/samples/DistanceImage').
-        doc 'Robot-centric elevation map (2.5D space representation)'
+    output_port('elevationMapMean', '/base/samples/DistanceImage').
+        doc 'Mean of robot-centric elevation map (2.5D space representation)'
+
+    output_port('elevationMapVariance', '/base/samples/DistanceImage').
+        doc 'Variance of robot-centric elevation map (2.5D space representation)'
 
     output_port('estimatedPose', '/base/samples/RigidBodyState').
         doc 'Corrected pose estimation (6D) with covariance and timestamp'

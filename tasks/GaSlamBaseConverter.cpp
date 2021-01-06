@@ -26,22 +26,36 @@ void GaSlamBaseConverter::convertPCLToBaseCloud(
 }
 
 void GaSlamBaseConverter::convertMapToBaseImage(
-        BaseImage& image,
+        BaseImage& mean_image,
+        BaseImage& var_image,
         const Map& map) {
     const auto params = map.getParameters();
     const auto meanData = map.getMeanZ();
+    const auto varData = map.getVarianceZ();
 
-    image.width = params.size;
-    image.height = params.size;
-    image.data.clear();
-    image.data.resize(image.width * image.height, NAN);
-    image.time = BaseTime::fromMicroseconds(map.getTimestamp());
+    /* init mean image */
+    mean_image.width = params.size;
+    mean_image.height = params.size;
+    mean_image.data.clear();
+    mean_image.data.resize(mean_image.width * mean_image.height, NAN);
+    mean_image.time = BaseTime::fromMicroseconds(map.getTimestamp());
+
+    /* init var image */
+    var_image.width = params.size;
+    var_image.height = params.size;
+    var_image.data.clear();
+    var_image.data.resize(var_image.width * var_image.height, NAN);
+    var_image.time = BaseTime::fromMicroseconds(map.getTimestamp());
 
     for (auto&& it = map.begin(); !it.isPastEnd(); ++it) {
         const grid_map::Index index(*it);
         const grid_map::Index imageIndex(it.getUnwrappedIndex());
-        const float value = meanData(index(0), index(1));
-        image.data[imageIndex(0) * image.height + imageIndex(1)] = value;
+
+        const float mean_value = meanData(index(0), index(1));
+        mean_image.data[imageIndex(0) * mean_image.height + imageIndex(1)] = mean_value;
+
+        const float var_value = varData(index(0), index(1));
+        var_image.data[imageIndex(0) * var_image.height + imageIndex(1)] = var_value;
     }
 }
 
