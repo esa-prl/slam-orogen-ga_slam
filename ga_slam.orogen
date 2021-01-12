@@ -132,6 +132,11 @@ task_context 'Task' do
     output_port('estimationError', 'double').
         doc 'absolute pose estimation error (norm of XY error vector)'
 
+    output_port('globalElevationMapMean', '/base/samples/DistanceImage').
+        doc 'Mean of robot-centric global elevation map from orbiter (2.5D space representation)'
+
+    output_port('globalElevationMapVariance', '/base/samples/DistanceImage').
+        doc 'Variance of robot-centric global elevation map from orbiter (2.5D space representation)'
 
     ####### Debug Ports #######
     property('debugInfoEnabled', 'bool', false).
