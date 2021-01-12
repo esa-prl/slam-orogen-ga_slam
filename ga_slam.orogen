@@ -120,23 +120,23 @@ task_context 'Task' do
         doc 'Pose of point cloud from the orbiter'
 
     ####### Output Ports #######
-    output_port('elevationMapMean', '/base/samples/DistanceImage').
-        doc 'Mean of robot-centric elevation map (2.5D space representation)'
+    output_port('localElevationMapMean', '/base/samples/DistanceImage').
+        doc 'Mean of robot-centric, local elevation map (2.5D space representation)'
 
-    output_port('elevationMapVariance', '/base/samples/DistanceImage').
-        doc 'Variance of robot-centric elevation map (2.5D space representation)'
+    output_port('localElevationMapVariance', '/base/samples/DistanceImage').
+        doc 'Variance of robot-centric, local elevation map (2.5D space representation)'
+
+    output_port('globalElevationMapMean', '/base/samples/DistanceImage').
+        doc 'Mean of robot-centric, global elevation map from orbiter (2.5D space representation)'
+
+    output_port('globalElevationMapVariance', '/base/samples/DistanceImage').
+        doc 'Variance of robot-centric, global elevation map from orbiter (2.5D space representation)'
 
     output_port('estimatedPose', '/base/samples/RigidBodyState').
         doc 'Corrected pose estimation (6D) with covariance and timestamp'
 
     output_port('estimationError', 'double').
         doc 'absolute pose estimation error (norm of XY error vector)'
-
-    output_port('globalElevationMapMean', '/base/samples/DistanceImage').
-        doc 'Mean of robot-centric global elevation map from orbiter (2.5D space representation)'
-
-    output_port('globalElevationMapVariance', '/base/samples/DistanceImage').
-        doc 'Variance of robot-centric global elevation map from orbiter (2.5D space representation)'
 
     ####### Debug Ports #######
     property('debugInfoEnabled', 'bool', false).

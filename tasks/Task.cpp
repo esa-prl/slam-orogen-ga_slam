@@ -99,10 +99,10 @@ void Task::cloudCallback(
 }
 
 void Task::outputPortData(void) {
-        BaseImage elevationMapMeanBaseImage, elevationMapVarianceBaseImage, globalElevationMapMeanBaseImage, globalElevationMapVarianceBaseImage;
+        BaseImage localElevationMapMeanBaseImage, localElevationMapVarianceBaseImage, globalElevationMapMeanBaseImage, globalElevationMapVarianceBaseImage;
 
         std::unique_lock<std::mutex> localGuard(gaSlam_.getLocalMapMutex());
-        GaSlamBaseConverter::convertMapToBaseImage(elevationMapMeanBaseImage, elevationMapVarianceBaseImage, gaSlam_.getLocalMap());
+        GaSlamBaseConverter::convertMapToBaseImage(localElevationMapMeanBaseImage, localElevationMapVarianceBaseImage, gaSlam_.getLocalMap());
         localGuard.unlock();
 
         std::unique_lock<std::mutex> globalGuard(gaSlam_.getGlobalMapMutex());
@@ -112,11 +112,11 @@ void Task::outputPortData(void) {
         BasePose estimatedPoseBase;
         estimatedPoseBase.setTransform(gaSlam_.getPose());
 
-        _elevationMapMean.write(elevationMapMeanBaseImage);
-        _elevationMapVariance.write(elevationMapVarianceBaseImage);
-        _estimatedPose.write(estimatedPoseBase);
+        _localElevationMapMean.write(localElevationMapMeanBaseImage);
+        _localElevationMapVariance.write(localElevationMapVarianceBaseImage);
         _globalElevationMapMean.write(globalElevationMapMeanBaseImage);
         _globalElevationMapVariance.write(globalElevationMapVarianceBaseImage);
+        _estimatedPose.write(estimatedPoseBase);
 
         double estimationError = sqrt(pow(estimatedPoseBase.position.x()-orbiterCloudPose_.position.x(),2) + pow(estimatedPoseBase.position.y()-orbiterCloudPose_.position.y(),2));
         _estimationError.write(estimationError);
