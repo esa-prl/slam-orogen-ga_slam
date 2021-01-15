@@ -3,8 +3,6 @@ name 'ga_slam'
 using_library 'ga_slam'
 using_library 'ga_slam_cereal'
 using_library 'grid_map_core'
-using_library 'pcl_common-1.8'
-using_library 'opencv'
 
 import_types_from 'base'
 
