@@ -9,7 +9,7 @@
   <depend package="base/orogen/types" />
   <depend package="drivers/orogen/aggregator" />
   <depend package="drivers/orogen/transformer" />
-  <!-- <depend package="external/opencv" /> This fails somehow-->
+  <depend package="opencv" />
   <depend package="external/grid_map_core" />
   <depend package="slam/ga_slam" />
   <depend package="slam/ga_slam_cereal" />
